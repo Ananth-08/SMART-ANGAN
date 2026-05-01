@@ -42,14 +42,22 @@ export interface Student {
 
 // Mock storage for Web to prevent crashes
 let webMockStudents: Student[] = [];
+let dbInstance: any = null;
+
+const getDb = async () => {
+  if (Platform.OS === 'web') return null;
+  if (dbInstance) return dbInstance;
+  dbInstance = await SQLite.openDatabaseAsync(DATABASE_NAME);
+  return dbInstance;
+};
 
 export const initDatabase = async () => {
-  if (Platform.OS === 'web') {
+  const db = await getDb();
+  if (!db) {
     console.log('SQLite not supported on Web. Using mock storage.');
     return null;
   }
 
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS students (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,7 +111,7 @@ export const addStudent = async (student: Student) => {
     return { id: newStudent.id, student_id: studentId };
   }
 
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+  const db = await getDb();
   const latestRecord = await db.getFirstAsync<{ serial_number: number }>(
     'SELECT serial_number FROM students WHERE month_code = ? AND year_code = ? ORDER BY serial_number DESC LIMIT 1',
     [monthCode, yearCode]
@@ -141,7 +149,6 @@ export const addStudent = async (student: Student) => {
     newSerial
   ];
 
-  // SQLite on Android crashes if any value is undefined. Ensure all are null if not present.
   const safeValues = values.map(v => v === undefined ? null : v);
 
   try {
@@ -165,7 +172,7 @@ export const addStudent = async (student: Student) => {
 export const getStudents = async () => {
   if (Platform.OS === 'web') return [...webMockStudents].reverse();
 
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+  const db = await getDb();
   return await db.getAllAsync<Student>('SELECT * FROM students ORDER BY created_at DESC');
 };
 
@@ -175,7 +182,7 @@ export const deleteStudent = async (id: number) => {
     return;
   }
 
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+  const db = await getDb();
   await db.runAsync('DELETE FROM students WHERE id = ?', [id]);
 };
 
@@ -188,7 +195,7 @@ export const updateStudent = async (id: number, student: Student) => {
     return;
   }
 
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+  const db = await getDb();
   await db.runAsync(
     `UPDATE students SET 
       first_name = ?, last_name = ?, dob = ?, gender = ?, profile_image = ?,

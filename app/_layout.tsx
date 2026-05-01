@@ -29,7 +29,7 @@ export default function RootLayout() {
       try {
         // Set system UI colors
         if (Platform.OS === 'android') {
-          await NavigationBar.setBackgroundColorAsync(colors.white);
+          // await NavigationBar.setBackgroundColorAsync(colors.white);
           await NavigationBar.setButtonStyleAsync('dark');
         }
         await SystemUI.setBackgroundColorAsync(colors.white);

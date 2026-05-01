@@ -18,6 +18,9 @@ export default function StudentsScreen() {
   const fetchStudents = async () => {
     try {
       const data = await getStudents();
+      console.log('--- Stored Students Details ---');
+      console.log(JSON.stringify(data, null, 2));
+      console.log('-------------------------------');
       setStudents(data);
     } catch (error) {
       console.error(error);

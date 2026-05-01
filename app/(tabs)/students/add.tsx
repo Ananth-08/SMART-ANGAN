@@ -20,26 +20,26 @@ export default function AddStudentScreen() {
   const [showMotherDatePicker, setShowMotherDatePicker] = useState(false);
 
   const initialFormState: Student = {
-    first_name: '',
-    last_name: '',
-    dob: '',
+    first_name: 'Ananth',
+    last_name: 'Kumar',
+    dob: '2018-05-15',
     gender: 'Male',
-    door_number: '',
-    street: '',
-    village: '',
-    zone: '',
-    city: '',
+    door_number: '12/A',
+    street: 'Gandhi Street',
+    village: 'Kodambakkam',
+    zone: 'Zone 5',
+    city: 'Chennai',
     state: 'Tamil Nadu',
-    pincode: '',
-    father_name: '',
-    father_mobile: '',
-    father_dob: '',
-    father_aadhar: '',
-    mother_name: '',
-    mother_mobile: '',
-    mother_dob: '',
-    mother_aadhar: '',
-    emergency_contact: '',
+    pincode: '600024',
+    father_name: 'Rajesh',
+    father_mobile: '9876543210',
+    father_dob: '1985-08-20',
+    father_aadhar: '123456789012',
+    mother_name: 'Sita',
+    mother_mobile: '9876543211',
+    mother_dob: '1988-10-12',
+    mother_aadhar: '987654321098',
+    emergency_contact: '9876543210',
   };
 
   // Form State
@@ -128,8 +128,7 @@ export default function AddStudentScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-     
+      {/* Header Removed */}
 
       <ScrollView 
         ref={scrollRef}
@@ -325,6 +324,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 16,
     color: colors.text,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   row: {
     flexDirection: 'row',
