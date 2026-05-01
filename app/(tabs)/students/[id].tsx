@@ -6,10 +6,12 @@ import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
 import { getStudentById, Student } from '../../../utils/database';
 import QRCode from 'react-native-qrcode-svg';
+import { useToast } from '../../../context/ToastContext';
 
 export default function StudentDetailsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +58,10 @@ export default function StudentDetailsScreen() {
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Student Profile</Text>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => router.push(`/(tabs)/students/edit/${id}`)}
+        >
           <Ionicons name="create-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -75,7 +80,7 @@ export default function StudentDetailsScreen() {
           </View>
           <Text style={styles.name}>{student.first_name} {student.last_name}</Text>
           <Text style={styles.studentId}>{student.student_id}</Text>
-          
+
           <View style={styles.badgeRow}>
             <View style={[styles.badge, { backgroundColor: '#E8F5E9' }]}>
               <Text style={[styles.badgeText, { color: '#2E7D32' }]}>{student.gender}</Text>
@@ -88,7 +93,20 @@ export default function StudentDetailsScreen() {
 
         {/* QR Code Section */}
         <View style={styles.qrSection}>
-          <Text style={styles.sectionTitle}>Digital ID</Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Digital ID</Text>
+            <View style={styles.downloadActions}>
+              <TouchableOpacity style={styles.miniButton} onPress={() => showToast('Downloading QR Code...', 'info')}>
+                <Ionicons name="download-outline" size={16} color={colors.primary} />
+                <Text style={styles.miniButtonText}>QR</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.miniButton} onPress={() => showToast('Generating ID Card...', 'info')}>
+                <Ionicons name="card-outline" size={16} color={colors.primary} />
+                <Text style={styles.miniButtonText}>ID</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={styles.qrCard}>
             <QRCode
               value={student.student_id || ''}
@@ -163,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : 15,
+    paddingTop: 40,
     paddingBottom: 20,
     backgroundColor: colors.white,
   },

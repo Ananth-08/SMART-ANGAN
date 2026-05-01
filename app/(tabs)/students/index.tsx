@@ -94,10 +94,10 @@ export default function StudentsScreen() {
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.actionButton}
-          onPress={() => router.push(`/(tabs)/students/${item.id}`)}
+          onPress={() => router.push(`/(tabs)/students/edit/${item.id}`)}
         >
           <Ionicons name="create-outline" size={18} color={colors.primary} />
-          <Text style={[styles.actionText, { color: colors.primary }]}>View</Text>
+          <Text style={[styles.actionText, { color: colors.primary }]}>Edit</Text>
         </TouchableOpacity>
       </View>
     </View>

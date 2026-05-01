@@ -89,6 +89,15 @@ export const initDatabase = async () => {
       serial_number INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS attendance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      student_db_id INTEGER,
+      date TEXT NOT NULL,
+      status TEXT NOT NULL,
+      UNIQUE(student_db_id, date),
+      FOREIGN KEY (student_db_id) REFERENCES students (id) ON DELETE CASCADE
+    );
   `);
   return db;
 };
@@ -219,4 +228,29 @@ export const getStudentById = async (id: number) => {
 
   const db = await getDb();
   return await db.getFirstAsync<Student>('SELECT * FROM students WHERE id = ?', [id]);
+};
+
+export const saveAttendance = async (attendanceRecords: { student_db_id: number, date: string, status: string }[]) => {
+  if (Platform.OS === 'web') {
+    // Mock web attendance if needed
+    return;
+  }
+
+  const db = await getDb();
+  for (const record of attendanceRecords) {
+    await db.runAsync(
+      'INSERT OR REPLACE INTO attendance (student_db_id, date, status) VALUES (?, ?, ?)',
+      [record.student_db_id, record.date, record.status]
+    );
+  }
+};
+
+export const getAttendanceByDate = async (date: string) => {
+  if (Platform.OS === 'web') return [];
+
+  const db = await getDb();
+  return await db.getAllAsync<{ student_db_id: number, status: string }>(
+    'SELECT student_db_id, status FROM attendance WHERE date = ?',
+    [date]
+  );
 };
