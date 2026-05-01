@@ -13,6 +13,7 @@ import { colors } from '../theme/colors';
 import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from '../context/AuthContext';
+import { ToastProvider } from '../context/ToastContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -52,13 +53,15 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(auth)/login" />
-        <Stack.Screen name="(auth)/signup" />
-      </Stack>
-      <StatusBar style="dark" />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(auth)/login" />
+          <Stack.Screen name="(auth)/signup" />
+        </Stack>
+        <StatusBar style="dark" />
+      </AuthProvider>
+    </ToastProvider>
   );
 }

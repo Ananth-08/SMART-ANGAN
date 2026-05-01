@@ -18,15 +18,39 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const { width } = Dimensions.get('window');
 
 const Login = () => {
   const router = useRouter();
+  const { signIn } = useAuth();
+  const { showToast } = useToast();
   const { t, i18n } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      showToast('Please fill in all fields', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await signIn(email, password);
+      showToast('Login Successful! Welcome back.', 'success');
+      // Navigation will be handled by the layout redirect or manual push
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      showToast(error.message || 'Login Failed', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleLanguage = async () => {
     let newLng = 'en';
@@ -116,8 +140,14 @@ const Login = () => {
             <Text style={styles.forgotText}>{t('common.forgot_password')}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>{t('common.login')}</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, isLoading && { opacity: 0.7 }]} 
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            <Text style={styles.loginButtonText}>
+              {isLoading ? t('common.loading') : t('common.login')}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.signupContainer}>
