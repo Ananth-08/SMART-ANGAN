@@ -29,5 +29,19 @@
     "help": "Help & Training Material",
     "tech_support": "Technical Support",
     "privacy": "Privacy Policy"
+  },
+  "dashboard": {
+    "greeting": "Daily Dashboard",
+    "total_students": "Total Students",
+    "present_today": "Present Today",
+    "meals_provided": "Meals Provided",
+    "health_alerts": "Health Alerts",
+    "quick_actions": "Quick Actions",
+    "enroll": "Enroll",
+    "attend": "Attend",
+    "alerts": "Alerts",
+    "config": "Config",
+    "recent_updates": "Recent Updates",
+    "overview": "Overview"
   }
 }

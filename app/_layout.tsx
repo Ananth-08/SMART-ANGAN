@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { initDatabase } from '../utils/database';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -56,15 +57,17 @@ export default function RootLayout() {
   }
 
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(auth)/login" />
-          <Stack.Screen name="(auth)/signup" />
-        </Stack>
-        <StatusBar style="dark" />
-      </AuthProvider>
-    </ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(auth)/signup" />
+          </Stack>
+          <StatusBar style="dark" />
+        </AuthProvider>
+      </ToastProvider>
+    </LanguageProvider>
   );
 }

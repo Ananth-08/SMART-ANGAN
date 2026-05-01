@@ -6,21 +6,21 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useTranslation } from 'react-i18next';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLanguage } from '../../context/LanguageContext';
 import { useRouter } from 'expo-router';
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
   const { showToast } = useToast();
   const { t, i18n } = useTranslation();
+  const { changeLanguage } = useLanguage();
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
 
   const currentLanguage = i18n.language;
 
-  const changeLanguage = async (lng: string) => {
-    await i18n.changeLanguage(lng);
-    await AsyncStorage.setItem('user-language', lng);
+  const handleLanguageChange = async (lng: string) => {
+    await changeLanguage(lng);
     const langLabel = lng === 'en' ? 'English' : lng === 'hi' ? 'Hindi' : 'Tamil';
     showToast(`Language changed to ${langLabel}`, 'success');
   };
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
       {/* Localization Section */}
       <Text style={styles.sectionLabel}>{t('settings.localization')}</Text>
       <View style={styles.optionsCard}>
-        <TouchableOpacity style={styles.languageItem} onPress={() => changeLanguage('en')}>
+        <TouchableOpacity style={styles.languageItem} onPress={() => handleLanguageChange('en')}>
           <View style={styles.optionLeft}>
             <Ionicons name="globe-outline" size={24} color={colors.textSecondary} />
             <View style={styles.optionTextContainer}>
@@ -94,7 +94,7 @@ export default function SettingsScreen() {
         
         <View style={styles.divider} />
 
-        <TouchableOpacity style={styles.languageItem} onPress={() => changeLanguage('hi')}>
+        <TouchableOpacity style={styles.languageItem} onPress={() => handleLanguageChange('hi')}>
           <View style={styles.optionLeft}>
             <MaterialCommunityIcons name="translate" size={24} color={colors.textSecondary} />
             <View style={styles.optionTextContainer}>
@@ -111,7 +111,7 @@ export default function SettingsScreen() {
         
         <View style={styles.divider} />
         
-        <TouchableOpacity style={styles.languageItem} onPress={() => changeLanguage('ta')}>
+        <TouchableOpacity style={styles.languageItem} onPress={() => handleLanguageChange('ta')}>
           <View style={styles.optionLeft}>
             <MaterialCommunityIcons name="translate" size={24} color={colors.textSecondary} />
             <View style={styles.optionTextContainer}>

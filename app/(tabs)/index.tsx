@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 const { width } = Dimensions.get('window');
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -85,9 +87,9 @@ export default function DashboardScreen() {
 
       <View style={styles.welcomeCard}>
         <View style={styles.welcomeInfo}>
-          <Text style={styles.greeting}>Daily Dashboard</Text>
+          <Text style={styles.greeting}>{t('dashboard.greeting')}</Text>
           <Text style={styles.userName}>Ananth M</Text>
-          <Text style={styles.welcomeSub}>{stats.totalStudents} Students Enrolled</Text>
+          <Text style={styles.welcomeSub}>{stats.totalStudents} {t('dashboard.total_students')}</Text>
         </View>
         <View style={styles.weatherBadge}>
           <Ionicons name="stats-chart" size={24} color="#A5D6A7" />
@@ -95,7 +97,7 @@ export default function DashboardScreen() {
       </View>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Overview</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.overview')}</Text>
         <TouchableOpacity onPress={fetchDashboardData}><Ionicons name="refresh-outline" size={20} color="#0A3327" /></TouchableOpacity>
       </View>
 
@@ -103,36 +105,36 @@ export default function DashboardScreen() {
         <ActivityIndicator size="large" color="#0A3327" style={{ marginVertical: 40 }} />
       ) : (
         <View style={styles.statsGrid}>
-          <StatCard icon="people" label="Total Students" value={stats.totalStudents} color="#0A3327" description="Registered base" />
-          <StatCard icon="calendar" label="Present Today" value={stats.presentToday} color="#10B981" description={`${Math.round((stats.presentToday/stats.totalStudents || 0)*100)}% Attendance`} />
-          <StatCard icon="restaurant" label="Meals Provided" value={stats.mealsServed} color="#F59E0B" description="Standard nutrition" />
-          <StatCard icon="heart" label="Health Alerts" value={stats.healthAlerts} color="#D32F2F" description="SAM/MAM status" />
+          <StatCard icon="people" label={t('dashboard.total_students')} value={stats.totalStudents} color="#0A3327" description="Registered base" />
+          <StatCard icon="calendar" label={t('dashboard.present_today')} value={stats.presentToday} color="#10B981" description={`${Math.round((stats.presentToday/stats.totalStudents || 0)*100)}% Attendance`} />
+          <StatCard icon="restaurant" label={t('dashboard.meals_provided')} value={stats.mealsServed} color="#F59E0B" description="Standard nutrition" />
+          <StatCard icon="heart" label={t('dashboard.health_alerts')} value={stats.healthAlerts} color="#D32F2F" description="SAM/MAM status" />
         </View>
       )}
 
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <Text style={styles.sectionTitle}>{t('dashboard.quick_actions')}</Text>
       <View style={styles.quickActionRow}>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/students')}>
           <View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}><Ionicons name="add" size={24} color="#2E7D32" /></View>
-          <Text style={styles.actionText}>Enroll</Text>
+          <Text style={styles.actionText}>{t('dashboard.enroll')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/attendance')}>
           <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}><Ionicons name="checkmark-done" size={24} color="#1565C0" /></View>
-          <Text style={styles.actionText}>Attend</Text>
+          <Text style={styles.actionText}>{t('dashboard.attend')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/messages')}>
           <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}><Ionicons name="chatbubbles" size={24} color="#EF6C00" /></View>
-          <Text style={styles.actionText}>Alerts</Text>
+          <Text style={styles.actionText}>{t('dashboard.alerts')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/settings')}>
           <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}><Ionicons name="settings" size={24} color="#7B1FA2" /></View>
-          <Text style={styles.actionText}>Config</Text>
+          <Text style={styles.actionText}>{t('dashboard.config')}</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.activitySection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Updates</Text>
+          <Text style={styles.sectionTitle}>{t('dashboard.recent_updates')}</Text>
           <TouchableOpacity onPress={() => router.push('/students')}><Text style={styles.viewMore}>Students</Text></TouchableOpacity>
         </View>
         
@@ -153,7 +155,7 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      {showDatePicker && <DateTimePicker value={selectedDate} mode="date" display="default" onChange={onDateChange} />}
+      {showDatePicker && <DateTimePicker value={selectedDate} mode="date" display="default" onChange={onDateChange} maximumDate={new Date()} />}
     </ScrollView>
   );
 }

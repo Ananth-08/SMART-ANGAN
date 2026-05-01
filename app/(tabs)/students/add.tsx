@@ -232,6 +232,7 @@ export default function AddStudentScreen() {
           mode="date"
           display="default"
           onChange={(e, d) => onDateChange(e, d, 'dob')}
+          maximumDate={new Date()}
         />
       )}
       {showFatherDatePicker && (
@@ -240,6 +241,7 @@ export default function AddStudentScreen() {
           mode="date"
           display="default"
           onChange={(e, d) => onDateChange(e, d, 'father_dob')}
+          maximumDate={new Date()}
         />
       )}
       {showMotherDatePicker && (
@@ -248,6 +250,7 @@ export default function AddStudentScreen() {
           mode="date"
           display="default"
           onChange={(e, d) => onDateChange(e, d, 'mother_dob')}
+          maximumDate={new Date()}
         />
       )}
     </View>

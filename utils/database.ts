@@ -338,6 +338,16 @@ export const getMeals = async (student_db_id: number) => {
   );
 };
 
+export const checkMealExists = async (student_db_id: number, date: string) => {
+  if (Platform.OS === 'web') return false;
+  const db = await getDb();
+  const result = await db.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM meals WHERE student_db_id = ? AND date = ?',
+    [student_db_id, date]
+  );
+  return (result?.count || 0) > 0;
+};
+
 export const getMealsCountByDate = async (date: string) => {
   if (Platform.OS === 'web') return 0;
   const db = await getDb();

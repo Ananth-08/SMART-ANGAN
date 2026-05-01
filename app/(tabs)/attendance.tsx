@@ -231,6 +231,7 @@ export default function AttendanceScreen() {
           mode="date"
           display="default"
           onChange={onDateChange}
+          maximumDate={new Date()}
         />
       )}
     </View>

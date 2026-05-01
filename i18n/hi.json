@@ -29,5 +29,19 @@
     "help": "सहायता और प्रशिक्षण सामग्री",
     "tech_support": "तकनीकी सहायता",
     "privacy": "गोपनीयता नीति"
+  },
+  "dashboard": {
+    "greeting": "दैनिक डैशबोर्ड",
+    "total_students": "कुल छात्र",
+    "present_today": "आज उपस्थित",
+    "meals_provided": "भोजन प्रदान किया गया",
+    "health_alerts": "स्वास्थ्य अलर्ट",
+    "quick_actions": "त्वरित कार्रवाई",
+    "enroll": "नामांकन",
+    "attend": "उपस्थिति",
+    "alerts": "अलर्ट",
+    "config": "कॉन्फ़िगर",
+    "recent_updates": "हाल के अपडेट",
+    "overview": "अवलोकन"
   }
 }

@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { getStudentById, Student, addHealthRecord, getHealthRecords, addVaccinationRecord, getVaccinationRecords, addMeal, getMeals } from '../../../utils/database';
+import { getStudentById, Student, addHealthRecord, getHealthRecords, addVaccinationRecord, getVaccinationRecords, addMeal, getMeals, checkMealExists } from '../../../utils/database';
 import QRCode from 'react-native-qrcode-svg';
 import { useToast } from '../../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -45,6 +45,7 @@ export default function StudentDetailsScreen() {
   const [mealRecords, setMealRecords] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showVaccineModal, setShowVaccineModal] = useState(false);
+  const [showMealModal, setShowMealModal] = useState(false);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   
   // Input State
@@ -52,6 +53,7 @@ export default function StudentDetailsScreen() {
   const [newWeight, setNewWeight] = useState('');
   const [vaccineName, setVaccineName] = useState('');
   const [vaccineNotes, setVaccineNotes] = useState('');
+  const [mealType, setMealType] = useState('Standard Balanced Meal');
   const [recordDate, setRecordDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -131,12 +133,23 @@ export default function StudentDetailsScreen() {
     } catch (error) { showToast('Failed to add vaccine', 'error'); }
   };
 
-  const handleProvideMeal = async () => {
+  const handleProvideMeal = () => {
+    setRecordDate(new Date());
+    setShowMealModal(true);
+  };
+
+  const handleSaveMeal = async () => {
+    const dateStr = recordDate.toISOString().split('T')[0];
     try {
-      await addMeal(Number(id), 'Standard Balanced Meal');
-      showToast('Meal provided recorded', 'success');
-      const mRecords = await getMeals(Number(id));
-      setMealRecords(mRecords);
+      const exists = await checkMealExists(Number(id), dateStr);
+      if (exists) {
+        showToast('Meal already recorded for this date', 'error');
+        return;
+      }
+      await addMeal(Number(id), mealType);
+      showToast('Meal recorded successfully', 'success');
+      setShowMealModal(false);
+      fetchStudentData();
     } catch (error) { showToast('Failed to record meal', 'error'); }
   };
 
@@ -309,6 +322,19 @@ export default function StudentDetailsScreen() {
         </View>
       </Modal>
 
+      {/* Add Meal Modal */}
+      <Modal visible={showMealModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowMealModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
+            <Text style={styles.modalTitle}>Record Meal</Text>
+            <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
+            <TextInput style={styles.modalInput} value={mealType} onChangeText={setMealType} placeholder="Meal Type" />
+            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#F59E0B' }]} onPress={handleSaveMeal}><Text style={styles.saveHealthButtonText}>Save Meal</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Analysis Modal */}
       <Modal visible={showAnalysisModal} transparent animationType="fade">
         <View style={styles.anaModalOverlay}>
@@ -353,7 +379,7 @@ export default function StudentDetailsScreen() {
         </View>
       </Modal>
 
-      {showDatePicker && <DateTimePicker value={recordDate} mode="date" display="default" onChange={(e,d)=>{setShowDatePicker(false);if(d)setRecordDate(d);}} />}
+      {showDatePicker && <DateTimePicker value={recordDate} mode="date" display="default" onChange={(e,d)=>{setShowDatePicker(false);if(d)setRecordDate(d);}} maximumDate={new Date()} />}
     </View>
   );
 }
@@ -421,6 +447,8 @@ const styles = StyleSheet.create({
   emptyText: { color: colors.textSecondary, fontSize: 14 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: colors.white, borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, gap: 16 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 8 },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: colors.text, marginBottom: 8 },
   anaModalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 },
   anaModalContent: { backgroundColor: '#F8FAFC', borderRadius: 32, padding: 20, maxHeight: '90%' },
   anaModalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
