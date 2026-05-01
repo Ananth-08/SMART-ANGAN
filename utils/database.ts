@@ -98,6 +98,17 @@ export const initDatabase = async () => {
       UNIQUE(student_db_id, date),
       FOREIGN KEY (student_db_id) REFERENCES students (id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS health_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      student_db_id INTEGER,
+      date TEXT NOT NULL,
+      height REAL NOT NULL,
+      weight REAL NOT NULL,
+      z_score REAL,
+      status TEXT,
+      FOREIGN KEY (student_db_id) REFERENCES students (id) ON DELETE CASCADE
+    );
   `);
   return db;
 };
@@ -252,5 +263,23 @@ export const getAttendanceByDate = async (date: string) => {
   return await db.getAllAsync<{ student_db_id: number, status: string }>(
     'SELECT student_db_id, status FROM attendance WHERE date = ?',
     [date]
+  );
+};
+
+export const addHealthRecord = async (record: { student_db_id: number, date: string, height: number, weight: number, z_score?: number, status?: string }) => {
+  if (Platform.OS === 'web') return;
+  const db = await getDb();
+  await db.runAsync(
+    'INSERT INTO health_records (student_db_id, date, height, weight, z_score, status) VALUES (?, ?, ?, ?, ?, ?)',
+    [record.student_db_id, record.date, record.height, record.weight, record.z_score || null, record.status || null]
+  );
+};
+
+export const getHealthRecords = async (student_db_id: number) => {
+  if (Platform.OS === 'web') return [];
+  const db = await getDb();
+  return await db.getAllAsync<{ id: number, date: string, height: number, weight: number, z_score: number, status: string }>(
+    'SELECT * FROM health_records WHERE student_db_id = ? ORDER BY date DESC',
+    [student_db_id]
   );
 };
