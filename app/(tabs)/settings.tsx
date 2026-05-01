@@ -7,11 +7,13 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
   const { showToast } = useToast();
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [syncing, setSyncing] = useState(false);
 
   const currentLanguage = i18n.language;
@@ -50,9 +52,9 @@ export default function SettingsScreen() {
           </View>
           <View style={styles.profileInfo}>
             <Text style={styles.roleText}>Primary Staff</Text>
-            <Text style={styles.nameText}>Anjali Devi</Text>
+            <Text style={styles.nameText}>Ananth M</Text>
             <View style={styles.idBadge}>
-              <Text style={styles.idText}>ID: AWC-4492</Text>
+              <Text style={styles.idText}>ID: SAT-0526-0001</Text>
             </View>
             <View style={styles.centerBadge}>
               <Text style={styles.centerText}>Center: Kodambakkam 3</Text>
@@ -128,7 +130,7 @@ export default function SettingsScreen() {
       {/* Support Section */}
       <Text style={styles.sectionLabel}>{t('settings.support')}</Text>
       <View style={styles.optionsCard}>
-        <TouchableOpacity style={styles.supportItem}>
+        <TouchableOpacity style={styles.supportItem} onPress={() => router.push('/support/help')}>
           <View style={styles.optionLeft}>
             <Ionicons name="help-circle-outline" size={24} color={colors.text} />
             <Text style={styles.supportTitle}>{t('settings.help')}</Text>
@@ -136,7 +138,7 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
         <View style={styles.divider} />
-        <TouchableOpacity style={styles.supportItem}>
+        <TouchableOpacity style={styles.supportItem} onPress={() => router.push('/support/tech-support')}>
           <View style={styles.optionLeft}>
             <Ionicons name="headset-outline" size={24} color={colors.text} />
             <Text style={styles.supportTitle}>{t('settings.tech_support')}</Text>
@@ -144,7 +146,7 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
         <View style={styles.divider} />
-        <TouchableOpacity style={styles.supportItem}>
+        <TouchableOpacity style={styles.supportItem} onPress={() => router.push('/support/privacy')}>
           <View style={styles.optionLeft}>
             <Ionicons name="document-text-outline" size={24} color={colors.text} />
             <Text style={styles.supportTitle}>{t('settings.privacy')}</Text>
