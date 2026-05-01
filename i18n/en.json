@@ -1,0 +1,21 @@
+{
+  "common": {
+    "welcome": "Welcome to Smart Angan",
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "dont_have_account": "Don't have an account?",
+    "signup": "Sign Up",
+    "select_language": "Select Language",
+    "loading": "Loading...",
+    "continue": "Continue"
+  },
+  "splash": {
+    "tagline": "Empowering Rural Communities"
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to your account to continue"
+  }
+}
