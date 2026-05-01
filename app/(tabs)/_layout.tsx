@@ -1,13 +1,19 @@
 import React from 'react';
-import { Tabs, useRouter, usePathname } from 'expo-router';
+import { Tabs, useRouter, usePathname, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { Platform, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { useAuth } from '../../context/AuthContext';
 
 export default function TabLayout() {
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const isSettings = pathname === '/settings';
+
+  if (!isLoading && !user) {
+    return <Redirect href="/(auth)/login" />;
+  }
 
   return (
     <Tabs
@@ -18,13 +24,13 @@ export default function TabLayout() {
           backgroundColor: colors.white,
           borderTopWidth: 1,
           borderTopColor: '#F0F0F0',
-          height: Platform.OS === 'ios' ? 90 : 80,
-          paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+          height: Platform.OS === 'ios' ? 85 : 65,
+          paddingBottom: Platform.OS === 'ios' ? 25 : 10,
         },
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginBottom: 5,
+          fontSize: 10,
+          fontWeight: '700',
+          marginBottom: 2,
         },
         headerShown: true,
         headerTitle: 'SmartAngan',
@@ -93,9 +99,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.activeTabBg : null}>
-              <Ionicons name={focused ? 'settings' : 'settings-outline'} size={22} color={color} />
-            </View>
+            <Ionicons name={focused ? 'settings' : 'settings-outline'} size={22} color={color} />
           ),
         }}
       />
@@ -103,11 +107,4 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  activeTabBg: {
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 20,
-    paddingVertical: 4,
-    borderRadius: 20,
-  }
-});
+

@@ -63,13 +63,6 @@ export default function SettingsScreen() {
 
       {/* Pi Hub Sync Card */}
       <View style={styles.syncCard}>
-        <View style={styles.syncHeader}>
-          <View style={styles.syncTitleRow}>
-            <MaterialCommunityIcons name="sync" size={24} color="#E67E22" />
-            <Text style={styles.syncTitle}>{t('settings.sync')}</Text>
-          </View>
-          <Text style={styles.lastSyncText}>Last synced: 10 mins ago</Text>
-        </View>
         <Text style={styles.syncDescription}>
           {t('settings.sync_desc')}
         </Text>

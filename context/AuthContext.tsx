@@ -9,10 +9,6 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
-// Hardcoded encrypted credentials
-const HARDCODED_USER_ENC = "U2FsdGVkX1/DtBaFPKCjTc/iWFLmBGEbYyvBZJACrSk=";
-const HARDCODED_PASS_ENC = "U2FsdGVkX18Tr+rGjJ2w+gFsoFA7z9Xrmgc8wELnu9U=";
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -40,14 +36,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadStorageData();
   }, []);
 
-  const signIn = async (username: string, password: string) => {
-    // Decrypt hardcoded credentials for comparison
-    const validUser = decryptData(HARDCODED_USER_ENC);
-    const validPass = decryptData(HARDCODED_PASS_ENC);
+  const signIn = async (usernameInput: string, passwordInput: string) => {
+    // Hardcoded credentials as requested for the demo
+    const validUser = 'ananth';
+    const validPass = 'Ananth98765';
 
-    if (username === validUser && password === validPass) {
-      const userData = { username };
+    if (usernameInput === validUser && passwordInput === validPass) {
+      const userData = { username: usernameInput };
       setUser(userData);
+      
+      // Persist the session using simple encryption
       const encryptedUserData = encryptData(JSON.stringify(userData));
       await AsyncStorage.setItem('@AuthData', encryptedUserData);
     } else {

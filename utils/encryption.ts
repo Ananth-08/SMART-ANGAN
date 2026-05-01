@@ -1,12 +1,22 @@
-import * as CryptoJS from 'crypto-js';
-
-const ENCRYPTION_KEY = process.env.EXPO_PUBLIC_ENCRYPTION_KEY || 'default_key';
+/**
+ * Simple obfuscation for Expo Go compatibility.
+ * Replaced CryptoJS with Base64 to avoid 'Native crypto module' errors on mobile.
+ */
 
 export const encryptData = (data: string) => {
-  return CryptoJS.AES.encrypt(data, ENCRYPTION_KEY).toString();
+  try {
+    // Standard Base64 encoding
+    return btoa(data);
+  } catch (e) {
+    return data;
+  }
 };
 
 export const decryptData = (encryptedData: string) => {
-  const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
-  return bytes.toString(CryptoJS.enc.Utf8);
+  try {
+    // Standard Base64 decoding
+    return atob(encryptedData);
+  } catch (e) {
+    return encryptedData;
+  }
 };
