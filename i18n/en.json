@@ -17,5 +17,17 @@
   "login": {
     "title": "Welcome Back",
     "subtitle": "Sign in to your account to continue"
+  },
+  "settings": {
+    "profile": "Profile Details",
+    "localization": "LOCALIZATION",
+    "support": "SUPPORT",
+    "sync": "Pi Hub Sync",
+    "sync_now": "Sync Now",
+    "sync_desc": "Ensure all your offline records are updated with the central Pi Hub database for accurate reporting.",
+    "logout": "Logout from SmartAngan",
+    "help": "Help & Training Material",
+    "tech_support": "Technical Support",
+    "privacy": "Privacy Policy"
   }
 }
