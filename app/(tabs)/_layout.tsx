@@ -37,23 +37,23 @@ export default function TabLayout() {
         headerLeft: () => {
           if (pathname === '/') return null;
           return (
-            <TouchableOpacity 
-              style={{ marginLeft: 20 }} 
+            <TouchableOpacity
+              style={{ marginLeft: 20 }}
               onPress={() => router.push('/(tabs)')}
             >
-              <Ionicons 
-                name="chevron-back" 
-                size={28} 
-                color="#0A3327" 
+              <Ionicons
+                name="chevron-back"
+                size={28}
+                color="#0A3327"
               />
             </TouchableOpacity>
           );
         },
         headerRight: () => (
           <TouchableOpacity style={{ marginRight: 20 }}>
-            <Image 
-              source={{ uri: 'https://i.pravatar.cc/100?u=anjali' }} 
-              style={{ width: 36, height: 36, borderRadius: 18 }} 
+            <Image
+              source={{ uri: 'https://i.pravatar.cc/100?u=anjali' }}
+              style={{ width: 36, height: 36, borderRadius: 18 }}
             />
           </TouchableOpacity>
         ),
@@ -72,7 +72,16 @@ export default function TabLayout() {
         options={{
           title: 'Dashboard',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'grid' : 'grid-outline'} size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="attendance"
+        options={{
+          title: 'Attendance',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -86,7 +95,6 @@ export default function TabLayout() {
         }}
         listeners={({ navigation }) => ({
           tabPress: (e) => {
-            // Prevent default behavior and force navigation to the index
             e.preventDefault();
             navigation.navigate('students', { screen: 'index' });
           },
@@ -97,7 +105,7 @@ export default function TabLayout() {
         options={{
           title: 'Messages',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'chatbox' : 'chatbox-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'chatbox' : 'chatbox-outline'} size={24} color={color} />
           ),
         }}
       />
@@ -106,12 +114,10 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? 'settings' : 'settings-outline'} size={22} color={color} />
+            <Ionicons name={focused ? 'settings' : 'settings-outline'} size={24} color={color} />
           ),
         }}
       />
     </Tabs>
   );
 }
-
-

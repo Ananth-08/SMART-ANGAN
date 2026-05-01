@@ -213,3 +213,10 @@ export const updateStudent = async (id: number, student: Student) => {
     ]
   );
 };
+
+export const getStudentById = async (id: number) => {
+  if (Platform.OS === 'web') return webMockStudents.find(s => s.id === id) || null;
+
+  const db = await getDb();
+  return await db.getFirstAsync<Student>('SELECT * FROM students WHERE id = ?', [id]);
+};
