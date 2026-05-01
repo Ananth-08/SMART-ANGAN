@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/logo.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.exceptionhandlers.smartangan"
     },
     "web": {
       "output": "static",
