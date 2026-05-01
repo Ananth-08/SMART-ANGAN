@@ -258,6 +258,18 @@ export const getStudentById = async (id: number) => {
   return await db.getFirstAsync<Student>('SELECT * FROM students WHERE id = ?', [id]);
 };
 
+export const findStudentByParentMobile = async (mobile: string) => {
+  if (Platform.OS === 'web') {
+    return webMockStudents.find(s => s.father_mobile === mobile || s.mother_mobile === mobile) || null;
+  }
+
+  const db = await getDb();
+  return await db.getFirstAsync<Student>(
+    'SELECT * FROM students WHERE father_mobile = ? OR mother_mobile = ?',
+    [mobile, mobile]
+  );
+};
+
 export const saveAttendance = async (attendanceRecords: { student_db_id: number, date: string, status: string }[]) => {
   if (Platform.OS === 'web') {
     // Mock web attendance if needed

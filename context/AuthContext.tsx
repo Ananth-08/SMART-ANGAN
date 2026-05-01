@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { encryptData, decryptData } from '../utils/encryption';
+import { findStudentByParentMobile } from '../utils/database';
 
 interface AuthContextType {
   user: any;
   signIn: (username: string, password: string) => Promise<void>;
+  signInAsParent: (mobile: string) => Promise<void>;
   signOut: () => Promise<void>;
   isLoading: boolean;
 }
@@ -37,19 +39,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signIn = async (usernameInput: string, passwordInput: string) => {
-    // Hardcoded credentials as requested for the demo
+    // Hardcoded credentials for Admin/Staff
     const validUser = 'ananth';
     const validPass = 'Ananth98765';
 
     if (usernameInput === validUser && passwordInput === validPass) {
-      const userData = { username: usernameInput };
+      const userData = { 
+        username: usernameInput, 
+        role: 'admin',
+        name: 'Ananth M'
+      };
       setUser(userData);
       
-      // Persist the session using simple encryption
       const encryptedUserData = encryptData(JSON.stringify(userData));
       await AsyncStorage.setItem('@AuthData', encryptedUserData);
     } else {
       throw new Error('Invalid username or password');
+    }
+  };
+
+  const signInAsParent = async (mobile: string) => {
+    const student = await findStudentByParentMobile(mobile);
+    if (student) {
+      const userData = {
+        username: mobile,
+        role: 'parent',
+        studentId: student.id,
+        studentName: `${student.first_name} ${student.last_name}`,
+        name: student.father_name || student.mother_name || 'Parent'
+      };
+      setUser(userData);
+      
+      const encryptedUserData = encryptData(JSON.stringify(userData));
+      await AsyncStorage.setItem('@AuthData', encryptedUserData);
+    } else {
+      throw new Error('Mobile number not registered with any student');
     }
   };
 
@@ -59,7 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut, isLoading }}>
+    <AuthContext.Provider value={{ user, signIn, signInAsParent, signOut, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

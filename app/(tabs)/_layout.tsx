@@ -10,6 +10,8 @@ export default function TabLayout() {
   const router = useRouter();
   const pathname = usePathname();
   
+  const isParent = user?.role === 'parent';
+
   // Define routes where tabs should be visible
   const tabRoutes = ['/', '/attendance', '/students', '/messages', '/settings'];
   const showTabs = tabRoutes.includes(pathname);
@@ -21,7 +23,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#0A3327', // Deep green from image
+        tabBarActiveTintColor: '#0A3327', // Deep green
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           backgroundColor: colors.white,
@@ -59,7 +61,7 @@ export default function TabLayout() {
             onPress={() => router.push('/settings')}
           >
             <Image
-              source={{ uri: 'https://i.pravatar.cc/100?u=anjali' }}
+              source={{ uri: isParent ? `https://ui-avatars.com/api/?name=${user.name}&background=0A3327&color=fff` : 'https://i.pravatar.cc/100?u=anjali' }}
               style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: '#0A3327' }}
             />
           </TouchableOpacity>
@@ -90,6 +92,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'calendar' : 'calendar-outline'} size={24} color={color} />
           ),
+          href: isParent ? null : '/attendance',
         }}
       />
       <Tabs.Screen
@@ -99,13 +102,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'people' : 'people-outline'} size={24} color={color} />
           ),
+          href: isParent ? null : '/students',
+          listeners: ({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate('students', { screen: 'index' });
+            },
+          }),
         }}
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            navigation.navigate('students', { screen: 'index' });
-          },
-        })}
       />
       <Tabs.Screen
         name="messages"
@@ -114,6 +118,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'chatbox' : 'chatbox-outline'} size={24} color={color} />
           ),
+          href: isParent ? null : '/messages',
         }}
       />
       <Tabs.Screen
@@ -123,6 +128,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons name={focused ? 'settings' : 'settings-outline'} size={24} color={color} />
           ),
+          href: isParent ? null : '/settings',
         }}
       />
     </Tabs>
