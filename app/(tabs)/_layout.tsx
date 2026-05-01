@@ -54,10 +54,13 @@ export default function TabLayout() {
           );
         },
         headerRight: () => (
-          <TouchableOpacity style={{ marginRight: 20 }}>
+          <TouchableOpacity 
+            style={{ marginRight: 20 }}
+            onPress={() => router.push('/settings')}
+          >
             <Image
               source={{ uri: 'https://i.pravatar.cc/100?u=anjali' }}
-              style={{ width: 36, height: 36, borderRadius: 18 }}
+              style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: '#0A3327' }}
             />
           </TouchableOpacity>
         ),

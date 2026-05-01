@@ -219,9 +219,9 @@ export default function StudentDetailsScreen() {
         ) : (
           <View style={styles.healthContainer}>
             <View style={styles.healthHeader}>
-              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAnalysisModal(true)}><Ionicons name="bar-chart-outline" size={20} color={colors.primary} /><Text style={styles.analysisText}>Analysis</Text></TouchableOpacity>
-              <TouchableOpacity style={styles.addDataButton} onPress={() => setShowAddModal(true)}><Ionicons name="add" size={20} color={colors.white} /><Text style={styles.addDataText}>Growth</Text></TouchableOpacity>
-              <TouchableOpacity style={[styles.addDataButton, { backgroundColor: '#0A3327' }]} onPress={() => setShowVaccineModal(true)}><Ionicons name="shield-outline" size={20} color={colors.white} /><Text style={styles.addDataText}>Vaccine</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAnalysisModal(true)}><Ionicons name="bar-chart-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Analysis</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAddModal(true)}><Ionicons name="fitness-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Growth</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowVaccineModal(true)}><Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Vaccine</Text></TouchableOpacity>
             </View>
 
             <Text style={styles.historyTitle}>Growth History</Text>
@@ -261,11 +261,11 @@ export default function StudentDetailsScreen() {
       <Modal visible={showAddModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}><Text style={styles.modalTitle}>Add Growth Data</Text><TouchableOpacity onPress={() => setShowAddModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
+            <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowAddModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
             <TextInput style={styles.modalInput} value={newHeight} onChangeText={setNewHeight} keyboardType="numeric" placeholder="Height (cm)" />
             <TextInput style={styles.modalInput} value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder="Weight (kg)" />
-            <TouchableOpacity style={styles.saveHealthButton} onPress={handleAddHealthData}><Text style={styles.saveHealthButtonText}>Save Growth</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.saveHealthButton} onPress={handleAddHealthData}><Text style={styles.saveHealthButtonText}>Save</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -274,11 +274,11 @@ export default function StudentDetailsScreen() {
       <Modal visible={showVaccineModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}><Text style={styles.modalTitle}>Add Vaccination</Text><TouchableOpacity onPress={() => setShowVaccineModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
+            <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowVaccineModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
             <TextInput style={styles.modalInput} value={vaccineName} onChangeText={setVaccineName} placeholder="Vaccine Name (e.g. BCG, Polio)" />
             <TextInput style={styles.modalInput} value={vaccineNotes} onChangeText={setVaccineNotes} placeholder="Notes (Optional)" multiline />
-            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#0A3327' }]} onPress={handleAddVaccination}><Text style={styles.saveHealthButtonText}>Save Vaccination</Text></TouchableOpacity>
+            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#0A3327' }]} onPress={handleAddVaccination}><Text style={styles.saveHealthButtonText}>Save</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -381,10 +381,8 @@ const styles = StyleSheet.create({
   detailValue: { fontSize: 15, fontWeight: '600', color: colors.text },
   healthContainer: { gap: 20 },
   healthHeader: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
-  viewAnalysisButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F0F9F6', paddingVertical: 12, borderRadius: 16, gap: 4 },
+  viewAnalysisButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F0F9F6', paddingVertical: 10, borderRadius: 16, gap: 4 },
   analysisText: { fontSize: 13, fontWeight: '700', color: colors.primary },
-  addDataButton: { flex: 1.2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, paddingVertical: 12, borderRadius: 16, gap: 4 },
-  addDataText: { fontSize: 13, fontWeight: '700', color: colors.white },
   historyTitle: { ...typography.h3, fontSize: 18, color: colors.text, marginTop: 10 },
   historyItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.white, padding: 16, borderRadius: 20, marginBottom: 12, elevation: 2 },
   historyIcon: { width: 48, height: 48, borderRadius: 16, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
