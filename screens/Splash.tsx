@@ -52,7 +52,7 @@ const Splash = ({ onFinish }: { onFinish: () => void }) => {
         ]}
       >
         <Image
-          source={require('../assets/logo.png')}
+          source={require('../assets/app_icon.png')}
           style={styles.logo}
           resizeMode="contain"
         />

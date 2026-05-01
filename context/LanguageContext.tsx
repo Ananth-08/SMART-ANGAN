@@ -54,7 +54,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         <Animated.View style={[styles.loadingOverlay, { opacity: fadeAnim }]}>
           <View style={styles.logoContainer}>
             <Image
-              source={require('../assets/logo.png')}
+              source={require('../assets/app_icon.png')}
               style={styles.logo}
               resizeMode="contain"
             />
