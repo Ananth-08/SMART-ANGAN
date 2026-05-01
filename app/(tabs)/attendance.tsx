@@ -7,6 +7,7 @@ import { typography } from '../../theme/typography';
 import { getStudents, Student, saveAttendance, getAttendanceByDate } from '../../utils/database';
 import { useToast } from '../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 
 interface AttendanceRecord {
   student_db_id: number;
@@ -14,6 +15,7 @@ interface AttendanceRecord {
 }
 
 export default function AttendanceScreen() {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
@@ -53,7 +55,7 @@ export default function AttendanceScreen() {
       setAttendance(attendanceMap);
     } catch (error) {
       console.error(error);
-      showToast('Failed to load data', 'error');
+      showToast(t('common.no_data'), 'error');
     } finally {
       setLoading(false);
     }
@@ -89,7 +91,7 @@ export default function AttendanceScreen() {
         status
       }));
       await saveAttendance(records);
-      showToast('Attendance saved successfully', 'success');
+      showToast(t('attendance.records_saved'), 'success');
     } catch (error) {
       showToast('Failed to save attendance', 'error');
     } finally {
@@ -128,7 +130,7 @@ export default function AttendanceScreen() {
             onPress={() => toggleAttendance(item.id!)}
           >
             <Text style={[styles.statusText, isPresent ? styles.presentText : styles.absentText]}>
-              {isPresent ? 'Present' : 'Absent'}
+              {isPresent ? t('attendance.present') : t('attendance.absent')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -138,7 +140,6 @@ export default function AttendanceScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Custom Header in Screen */}
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.dateSelector} onPress={() => setShowDatePicker(true)}>
           <Ionicons name="calendar-outline" size={20} color={colors.primary} />
@@ -158,7 +159,7 @@ export default function AttendanceScreen() {
         <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search students..."
+          placeholder={t('attendance.search_placeholder')}
           value={searchQuery}
           onChangeText={handleSearch}
           placeholderTextColor="#94A3B8"
@@ -176,17 +177,17 @@ export default function AttendanceScreen() {
         <View style={{ flex: 1 }}>
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Total</Text>
+              <Text style={styles.statLabel}>{t('dashboard.total_students')}</Text>
               <Text style={styles.statValue}>{students.length}</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Present</Text>
+              <Text style={styles.statLabel}>{t('attendance.present')}</Text>
               <Text style={[styles.statValue, { color: '#2E7D32' }]}>
                 {Object.values(attendance).filter(v => v === 'Present').length}
               </Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Absent</Text>
+              <Text style={styles.statLabel}>{t('attendance.absent')}</Text>
               <Text style={[styles.statValue, { color: colors.error }]}>
                 {Object.values(attendance).filter(v => v === 'Absent').length}
               </Text>
@@ -201,7 +202,7 @@ export default function AttendanceScreen() {
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Ionicons name="people-outline" size={60} color="#DDD" />
-                <Text style={styles.emptyText}>{searchQuery ? 'No matching students' : 'No students to show'}</Text>
+                <Text style={styles.emptyText}>{searchQuery ? t('common.no_data') : t('common.no_data')}</Text>
               </View>
             }
           />
@@ -217,7 +218,7 @@ export default function AttendanceScreen() {
               ) : (
                 <>
                   <Ionicons name="cloud-upload-outline" size={20} color={colors.white} />
-                  <Text style={styles.saveButtonText}>Save Attendance</Text>
+                  <Text style={styles.saveButtonText}>{t('common.save')}</Text>
                 </>
               )}
             </TouchableOpacity>

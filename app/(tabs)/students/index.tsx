@@ -7,8 +7,10 @@ import { typography } from '../../../theme/typography';
 import { getStudents, Student, deleteStudent } from '../../../utils/database';
 import { useToast } from '../../../context/ToastContext';
 import QRCode from 'react-native-qrcode-svg';
+import { useTranslation } from 'react-i18next';
 
 export default function StudentsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { showToast } = useToast();
   const [students, setStudents] = useState<Student[]>([]);
@@ -24,7 +26,7 @@ export default function StudentsScreen() {
       setFilteredStudents(data);
     } catch (error) {
       console.error(error);
-      showToast('Failed to load students', 'error');
+      showToast(t('common.no_data'), 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -57,7 +59,7 @@ export default function StudentsScreen() {
   const handleDelete = async (id: number) => {
     try {
       await deleteStudent(id);
-      showToast('Student deleted', 'info');
+      showToast(t('students.delete'), 'info');
       fetchStudents();
     } catch (error) {
       showToast('Delete failed', 'error');
@@ -104,14 +106,14 @@ export default function StudentsScreen() {
       <View style={styles.cardFooter}>
         <TouchableOpacity style={styles.actionButton} onPress={() => handleDelete(item.id!)}>
           <Ionicons name="trash-outline" size={18} color={colors.error} />
-          <Text style={[styles.actionText, { color: colors.error }]}>Delete</Text>
+          <Text style={[styles.actionText, { color: colors.error }]}>{t('students.delete')}</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.actionButton}
           onPress={() => router.push(`/(tabs)/students/edit/${item.id}`)}
         >
           <Ionicons name="create-outline" size={18} color={colors.primary} />
-          <Text style={[styles.actionText, { color: colors.primary }]}>Edit</Text>
+          <Text style={[styles.actionText, { color: colors.primary }]}>{t('students.edit')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -123,7 +125,7 @@ export default function StudentsScreen() {
         <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by name or student ID..."
+          placeholder={t('students.search_placeholder')}
           value={searchQuery}
           onChangeText={handleSearch}
           placeholderTextColor="#94A3B8"
@@ -150,13 +152,13 @@ export default function StudentsScreen() {
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Ionicons name="people-outline" size={80} color="#DDD" />
-                <Text style={styles.emptyText}>{searchQuery ? 'No matching students found' : 'No students registered yet'}</Text>
+                <Text style={styles.emptyText}>{searchQuery ? t('common.no_data') : t('common.no_data')}</Text>
                 {!searchQuery && (
                   <TouchableOpacity
                     style={styles.emptyAddButton}
                     onPress={() => router.push('/(tabs)/students/add')}
                   >
-                    <Text style={styles.emptyAddText}>Register First Student</Text>
+                    <Text style={styles.emptyAddText}>{t('students.add_student')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -203,26 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
     fontWeight: '500',
-  },
-  topHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  title: {
-    ...typography.h2,
-    fontSize: 22,
-    color: colors.text,
-  },
-  subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    fontSize: 14,
   },
   fab: {
     position: 'absolute',

@@ -9,7 +9,11 @@
     "signup": "Sign Up",
     "select_language": "Select Language",
     "loading": "Loading...",
-    "continue": "Continue"
+    "continue": "Continue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search...",
+    "no_data": "No data found"
   },
   "splash": {
     "tagline": "Empowering Rural Communities"
@@ -17,18 +21,6 @@
   "login": {
     "title": "Welcome Back",
     "subtitle": "Sign in to your account to continue"
-  },
-  "settings": {
-    "profile": "Profile Details",
-    "localization": "LOCALIZATION",
-    "support": "SUPPORT",
-    "sync": "Pi Hub Sync",
-    "sync_now": "Sync Now",
-    "sync_desc": "Ensure all your offline records are updated with the central Pi Hub database for accurate reporting.",
-    "logout": "Logout from SmartAngan",
-    "help": "Help & Training Material",
-    "tech_support": "Technical Support",
-    "privacy": "Privacy Policy"
   },
   "dashboard": {
     "greeting": "Daily Dashboard",
@@ -43,5 +35,67 @@
     "config": "Config",
     "recent_updates": "Recent Updates",
     "overview": "Overview"
+  },
+  "attendance": {
+    "title": "Attendance Tracking",
+    "mark_all_present": "Mark All Present",
+    "search_placeholder": "Search student by name or ID...",
+    "present": "Present",
+    "absent": "Absent",
+    "records_saved": "Attendance records saved"
+  },
+  "students": {
+    "title": "Student Directory",
+    "add_student": "Register New Student",
+    "details": "Details",
+    "edit": "Edit Profile",
+    "delete": "Delete",
+    "search_placeholder": "Search by name or ID...",
+    "profile": "Student Profile",
+    "health": "Health Dashboard",
+    "personal_info": "Personal Information",
+    "guardian_info": "Guardian Information",
+    "dob": "Date of Birth",
+    "gender": "Gender",
+    "address": "Address",
+    "village_zone": "Village/Zone",
+    "father_name": "Father Name",
+    "mother_name": "Mother Name",
+    "emergency": "Emergency Contact",
+    "nutrition_history": "Nutrition History",
+    "growth_history": "Growth History",
+    "vaccination_records": "Vaccination Records",
+    "analysis": "Analysis",
+    "growth": "Growth",
+    "vaccine": "Vaccine",
+    "meal": "Meal",
+    "provided": "Provided",
+    "administered": "Administered",
+    "record_meal": "Record Meal",
+    "save_meal": "Save Meal",
+    "meal_type": "Meal Type",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "vaccine_name": "Vaccine Name",
+    "notes": "Notes (Optional)"
+  },
+  "messages": {
+    "title": "Guardian Messaging",
+    "search_placeholder": "Search guardians...",
+    "select_all": "Select All",
+    "send_bulk": "Send Bulk SMS",
+    "msg_sent": "Message sent successfully"
+  },
+  "settings": {
+    "profile": "Profile Details",
+    "localization": "LOCALIZATION",
+    "support": "SUPPORT",
+    "sync": "Pi Hub Sync",
+    "sync_now": "Sync Now",
+    "sync_desc": "the cloud was not sync",
+    "logout": "Logout from SmartAngan",
+    "help": "Help & Training Material",
+    "tech_support": "Technical Support",
+    "privacy": "Privacy Policy"
   }
 }
