@@ -7,8 +7,10 @@ import { typography } from '../../theme/typography';
 import { getStudents, Student, getAttendanceByDate } from '../../utils/database';
 import { useToast } from '../../context/ToastContext';
 import * as SMS from 'expo-sms';
+import { useTranslation } from 'react-i18next';
 
 export default function MessagesScreen() {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [students, setStudents] = useState<Student[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
@@ -35,7 +37,7 @@ export default function MessagesScreen() {
       setAttendance(attendanceMap);
     } catch (error) {
       console.error(error);
-      showToast('Failed to load data', 'error');
+      showToast(t('common.no_data'), 'error');
     } finally {
       setLoading(false);
     }
@@ -86,19 +88,19 @@ export default function MessagesScreen() {
     }
 
     Alert.alert(
-      "Send SMS Update",
+      t('messaging.send_sms'),
       "Which group would you like to message?",
       [
         {
-          text: "Present Students",
+          text: t('attendance.present'),
           onPress: () => sendBulkSMS('Present')
         },
         {
-          text: "Absent Students",
+          text: t('attendance.absent'),
           onPress: () => sendBulkSMS('Absent')
         },
         {
-          text: "Cancel",
+          text: t('common.save'),
           style: "cancel"
         }
       ]
@@ -156,10 +158,10 @@ export default function MessagesScreen() {
           </View>
           <View style={styles.info}>
             <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
-            <Text style={styles.guardian}>Guardian: {item.father_name || item.mother_name || 'N/A'}</Text>
+            <Text style={styles.guardian}>{t('students.guardian_info')}: {item.father_name || item.mother_name || 'N/A'}</Text>
             <View style={[styles.statusBadge, status === 'Present' ? styles.presentBadge : styles.absentBadge]}>
               <Text style={[styles.statusText, status === 'Present' ? styles.presentText : styles.absentText]}>
-                {status}
+                {status === 'Present' ? t('attendance.present') : t('attendance.absent')}
               </Text>
             </View>
           </View>
@@ -178,7 +180,7 @@ export default function MessagesScreen() {
             onPress={() => handleCall(item.father_mobile || item.mother_mobile)}
           >
             <Ionicons name="call" size={18} color={colors.white} />
-            <Text style={styles.callButtonText}>Call Parent</Text>
+            <Text style={styles.callButtonText}>{t('messaging.call_parent')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -212,12 +214,12 @@ export default function MessagesScreen() {
             size={24} 
             color={colors.primary} 
           />
-          <Text style={styles.multiSelectText}>Select All</Text>
+          <Text style={styles.multiSelectText}>{t('messaging.select_all')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.sendSmsButton} onPress={handleSendSMS}>
           <Ionicons name="send" size={18} color={colors.white} />
-          <Text style={styles.sendSmsText}>Send SMS</Text>
+          <Text style={styles.sendSmsText}>{t('messaging.send_sms')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -225,7 +227,7 @@ export default function MessagesScreen() {
         <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search guardians or students..."
+          placeholder={t('messaging.search_placeholder')}
           value={searchQuery}
           onChangeText={handleSearch}
           placeholderTextColor="#94A3B8"
@@ -248,7 +250,7 @@ export default function MessagesScreen() {
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="chatbubbles-outline" size={60} color="#DDD" />
-              <Text style={styles.emptyText}>{searchQuery ? 'No matching contacts' : 'No students to message'}</Text>
+              <Text style={styles.emptyText}>{searchQuery ? t('common.no_data') : t('common.no_data')}</Text>
             </View>
           }
         />

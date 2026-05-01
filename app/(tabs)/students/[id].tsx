@@ -11,6 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -31,6 +32,7 @@ interface VaccineRecord {
 }
 
 export default function StudentDetailsScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { showToast } = useToast();
@@ -188,19 +190,19 @@ export default function StudentDetailsScreen() {
   };
 
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={colors.primary} /></View>;
-  if (!student) return <View style={styles.centered}><Text>Student not found</Text></View>;
+  if (!student) return <View style={styles.centered}><Text>{t('common.no_data')}</Text></View>;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}><Ionicons name="chevron-back" size={24} color={colors.text} /></TouchableOpacity>
-        <Text style={styles.headerTitle}>{activeTab === 'Profile' ? 'Student Profile' : 'Health Dashboard'}</Text>
+        <Text style={styles.headerTitle}>{activeTab === 'Profile' ? t('students.profile') : t('students.health')}</Text>
         <TouchableOpacity style={styles.iconButton} onPress={() => router.push(`/(tabs)/students/edit/${id}`)}><Ionicons name="create-outline" size={24} color={colors.text} /></TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
-        <TouchableOpacity style={[styles.tab, activeTab === 'Profile' && styles.activeTab]} onPress={() => setActiveTab('Profile')}><Text style={[styles.tabText, activeTab === 'Profile' && styles.activeTabText]}>Profile</Text></TouchableOpacity>
-        <TouchableOpacity style={[styles.tab, activeTab === 'Health' && styles.activeTab]} onPress={() => setActiveTab('Health')}><Text style={[styles.tabText, activeTab === 'Health' && styles.activeTabText]}>Health</Text></TouchableOpacity>
+        <TouchableOpacity style={[styles.tab, activeTab === 'Profile' && styles.activeTab]} onPress={() => setActiveTab('Profile')}><Text style={[styles.tabText, activeTab === 'Profile' && styles.activeTabText]}>{t('students.profile')}</Text></TouchableOpacity>
+        <TouchableOpacity style={[styles.tab, activeTab === 'Health' && styles.activeTab]} onPress={() => setActiveTab('Health')}><Text style={[styles.tabText, activeTab === 'Health' && styles.activeTabText]}>{t('students.health')}</Text></TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -228,42 +230,42 @@ export default function StudentDetailsScreen() {
               <View style={styles.qrCard}><QRCode getRef={(c) => (qrRef.current = c)} value={student.student_id || ''} size={150} color="#000" backgroundColor="white" /></View>
             </View>
             <View style={styles.detailsContainer}>
-              <DetailSection title="Personal Information">
-                <DetailItem icon="calendar-outline" label="Date of Birth" value={student.dob} />
-                <DetailItem icon="male-female-outline" label="Gender" value={student.gender} />
-                <DetailItem icon="location-outline" label="Address" value={`${student.door_number || ''} ${student.street || ''}`} />
-                <DetailItem icon="map-outline" label="Village/Zone" value={`${student.village || ''} - ${student.zone || ''}`} />
+              <DetailSection title={t('students.personal_info')}>
+                <DetailItem icon="calendar-outline" label={t('students.dob')} value={student.dob} />
+                <DetailItem icon="male-female-outline" label={t('students.gender')} value={student.gender} />
+                <DetailItem icon="location-outline" label={t('students.address')} value={`${student.door_number || ''} ${student.street || ''}`} />
+                <DetailItem icon="map-outline" label={t('students.village_zone')} value={`${student.village || ''} - ${student.zone || ''}`} />
               </DetailSection>
-              <DetailSection title="Guardian Information">
-                <DetailItem icon="man-outline" label="Father Name" value={student.father_name || 'N/A'} />
-                <DetailItem icon="woman-outline" label="Mother Name" value={student.mother_name || 'N/A'} />
-                <DetailItem icon="alert-circle-outline" label="Emergency" value={student.emergency_contact || 'N/A'} />
+              <DetailSection title={t('students.guardian_info')}>
+                <DetailItem icon="man-outline" label={t('students.father_name')} value={student.father_name || 'N/A'} />
+                <DetailItem icon="woman-outline" label={t('students.mother_name')} value={student.mother_name || 'N/A'} />
+                <DetailItem icon="alert-circle-outline" label={t('students.emergency')} value={student.emergency_contact || 'N/A'} />
               </DetailSection>
             </View>
           </>
         ) : (
           <View style={styles.healthContainer}>
             <View style={styles.healthHeader}>
-              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAnalysisModal(true)}><Ionicons name="bar-chart-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Analysis</Text></TouchableOpacity>
-              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAddModal(true)}><Ionicons name="fitness-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Growth</Text></TouchableOpacity>
-              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowVaccineModal(true)}><Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Vaccine</Text></TouchableOpacity>
-              <TouchableOpacity style={styles.viewAnalysisButton} onPress={handleProvideMeal}><Ionicons name="restaurant-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Meal</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAnalysisModal(true)}><Ionicons name="bar-chart-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>{t('students.analysis')}</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAddModal(true)}><Ionicons name="fitness-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>{t('students.growth')}</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowVaccineModal(true)}><Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>{t('students.vaccine')}</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={handleProvideMeal}><Ionicons name="restaurant-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>{t('students.meal')}</Text></TouchableOpacity>
             </View>
 
-            <Text style={styles.historyTitle}>Nutrition History</Text>
+            <Text style={styles.historyTitle}>{t('students.nutrition_history')}</Text>
             {mealRecords.slice(0, 3).map((record) => (
               <View key={record.id} style={styles.historyItem}>
                 <View style={[styles.historyIcon, { backgroundColor: '#FFF3E0' }]}><Ionicons name="restaurant" size={24} color="#EF6C00" /></View>
                 <View style={styles.historyInfo}>
-                  <Text style={styles.historyDate}>{new Date(record.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
+                  <Text style={styles.historyDate}>{new Date(record.date).toLocaleDateString()}</Text>
                   <Text style={styles.historyMetrics}>{record.meal_type}</Text>
                 </View>
-                <View style={[styles.statusTag, { backgroundColor: '#FFF3E0' }]}><Text style={[styles.statusTagText, { color: '#EF6C00' }]}>Provided</Text></View>
+                <View style={[styles.statusTag, { backgroundColor: '#FFF3E0' }]}><Text style={[styles.statusTagText, { color: '#EF6C00' }]}>{t('students.provided')}</Text></View>
               </View>
             ))}
-            {mealRecords.length === 0 && <View style={styles.emptyCard}><Text style={styles.emptyText}>No meals recorded for this student</Text></View>}
+            {mealRecords.length === 0 && <View style={styles.emptyCard}><Text style={styles.emptyText}>{t('common.no_data')}</Text></View>}
 
-            <Text style={[styles.historyTitle, { marginTop: 20 }]}>Growth History</Text>
+            <Text style={[styles.historyTitle, { marginTop: 20 }]}>{t('students.growth_history')}</Text>
             {healthRecords.slice(0, 3).map((record) => {
               const { color } = calculateStatus(record.height, record.weight);
               return (
@@ -278,7 +280,7 @@ export default function StudentDetailsScreen() {
               );
             })}
 
-            <Text style={[styles.historyTitle, { marginTop: 20 }]}>Vaccination Records</Text>
+            <Text style={[styles.historyTitle, { marginTop: 20 }]}>{t('students.vaccination_records')}</Text>
             {vaccinationRecords.map((record) => (
               <View key={record.id} style={styles.historyItem}>
                 <View style={[styles.historyIcon, { backgroundColor: '#F0F9F6' }]}><Ionicons name="shield-checkmark" size={24} color="#0A3327" /></View>
@@ -286,11 +288,11 @@ export default function StudentDetailsScreen() {
                   <Text style={styles.historyDate}>{record.vaccine_name}</Text>
                   <Text style={styles.historyMetrics}>{new Date(record.date).toLocaleDateString()} {record.notes ? `• ${record.notes}` : ''}</Text>
                 </View>
-                <View style={[styles.statusTag, { backgroundColor: '#E8F5E9' }]}><Text style={[styles.statusTagText, { color: '#2E7D32' }]}>Administered</Text></View>
+                <View style={[styles.statusTag, { backgroundColor: '#E8F5E9' }]}><Text style={[styles.statusTagText, { color: '#2E7D32' }]}>{t('students.administered')}</Text></View>
               </View>
             ))}
             {vaccinationRecords.length === 0 && (
-              <View style={styles.emptyCard}><Text style={styles.emptyText}>No vaccination records found</Text></View>
+              <View style={styles.emptyCard}><Text style={styles.emptyText}>{t('common.no_data')}</Text></View>
             )}
           </View>
         )}
@@ -302,9 +304,9 @@ export default function StudentDetailsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowAddModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
-            <TextInput style={styles.modalInput} value={newHeight} onChangeText={setNewHeight} keyboardType="numeric" placeholder="Height (cm)" />
-            <TextInput style={styles.modalInput} value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder="Weight (kg)" />
-            <TouchableOpacity style={styles.saveHealthButton} onPress={handleAddHealthData}><Text style={styles.saveHealthButtonText}>Save</Text></TouchableOpacity>
+            <TextInput style={styles.modalInput} value={newHeight} onChangeText={setNewHeight} keyboardType="numeric" placeholder={t('students.height')} />
+            <TextInput style={styles.modalInput} value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder={t('students.weight')} />
+            <TouchableOpacity style={styles.saveHealthButton} onPress={handleAddHealthData}><Text style={styles.saveHealthButtonText}>{t('common.save')}</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -315,9 +317,9 @@ export default function StudentDetailsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowVaccineModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
-            <TextInput style={styles.modalInput} value={vaccineName} onChangeText={setVaccineName} placeholder="Vaccine Name (e.g. BCG, Polio)" />
-            <TextInput style={styles.modalInput} value={vaccineNotes} onChangeText={setVaccineNotes} placeholder="Notes (Optional)" multiline />
-            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#0A3327' }]} onPress={handleAddVaccination}><Text style={styles.saveHealthButtonText}>Save</Text></TouchableOpacity>
+            <TextInput style={styles.modalInput} value={vaccineName} onChangeText={setVaccineName} placeholder={t('students.vaccine_name')} />
+            <TextInput style={styles.modalInput} value={vaccineNotes} onChangeText={setVaccineNotes} placeholder={t('students.notes')} multiline />
+            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#0A3327' }]} onPress={handleAddVaccination}><Text style={styles.saveHealthButtonText}>{t('common.save')}</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -327,10 +329,10 @@ export default function StudentDetailsScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowMealModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
-            <Text style={styles.modalTitle}>Record Meal</Text>
+            <Text style={styles.modalTitle}>{t('students.record_meal')}</Text>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
-            <TextInput style={styles.modalInput} value={mealType} onChangeText={setMealType} placeholder="Meal Type" />
-            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#F59E0B' }]} onPress={handleSaveMeal}><Text style={styles.saveHealthButtonText}>Save Meal</Text></TouchableOpacity>
+            <TextInput style={styles.modalInput} value={mealType} onChangeText={setMealType} placeholder={t('students.meal_type')} />
+            <TouchableOpacity style={[styles.saveHealthButton, { backgroundColor: '#F59E0B' }]} onPress={handleSaveMeal}><Text style={styles.saveHealthButtonText}>{t('students.save_meal')}</Text></TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -340,7 +342,7 @@ export default function StudentDetailsScreen() {
         <View style={styles.anaModalOverlay}>
           <View style={styles.anaModalContent}>
             <View style={styles.anaModalHeader}>
-              <Text style={styles.anaModalTitle}>Growth Analysis</Text>
+              <Text style={styles.anaModalTitle}>{t('students.analysis')}</Text>
               <TouchableOpacity onPress={() => setShowAnalysisModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity>
             </View>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -355,7 +357,7 @@ export default function StudentDetailsScreen() {
                 </View>
               </View>
               <View style={styles.anaHistoryCard}>
-                <View style={styles.anaHistoryHeader}><Text style={styles.anaHistoryTitle}>GROWTH HISTORY</Text></View>
+                <View style={styles.anaHistoryHeader}><Text style={styles.anaHistoryTitle}>{t('students.growth_history')}</Text></View>
                 <View style={styles.anaChartContainer}>
                   {healthRecords.slice(0, 4).reverse().map((r, i) => (
                     <View key={i} style={styles.anaBarWrapper}>

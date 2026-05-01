@@ -7,8 +7,10 @@ import { typography } from '../../../theme/typography';
 import { addStudent, Student } from '../../../utils/database';
 import { useToast } from '../../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 
 export default function AddStudentScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -20,26 +22,26 @@ export default function AddStudentScreen() {
   const [showMotherDatePicker, setShowMotherDatePicker] = useState(false);
 
   const initialFormState: Student = {
-    first_name: 'Ananth',
-    last_name: 'Kumar',
-    dob: '2018-05-15',
+    first_name: '',
+    last_name: '',
+    dob: '',
     gender: 'Male',
-    door_number: '12/A',
-    street: 'Gandhi Street',
-    village: 'Kodambakkam',
-    zone: 'Zone 5',
-    city: 'Chennai',
-    state: 'Tamil Nadu',
-    pincode: '600024',
-    father_name: 'Rajesh',
-    father_mobile: '9876543210',
-    father_dob: '1985-08-20',
-    father_aadhar: '123456789012',
-    mother_name: 'Sita',
-    mother_mobile: '9876543211',
-    mother_dob: '1988-10-12',
-    mother_aadhar: '987654321098',
-    emergency_contact: '9876543210',
+    door_number: '',
+    street: '',
+    village: '',
+    zone: '',
+    city: '',
+    state: '',
+    pincode: '',
+    father_name: '',
+    father_mobile: '',
+    father_dob: '',
+    father_aadhar: '',
+    mother_name: '',
+    mother_mobile: '',
+    mother_dob: '',
+    mother_aadhar: '',
+    emergency_contact: '',
   };
 
   // Form State
@@ -119,7 +121,7 @@ export default function AddStudentScreen() {
       <Text style={styles.inputLabel}>{label}</Text>
       <TouchableOpacity style={styles.input} onPress={onPress}>
         <Text style={{ color: value ? colors.text : '#999', fontSize: 16 }}>
-          {value || 'Select Date'}
+          {value || t('common.search')}
         </Text>
         <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
       </TouchableOpacity>
@@ -132,7 +134,7 @@ export default function AddStudentScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Register Student</Text>
+        <Text style={styles.headerTitle}>{t('students.add_student')}</Text>
         <TouchableOpacity style={styles.backButton} onPress={resetForm}>
           <Ionicons name="refresh-outline" size={22} color={colors.primary} />
         </TouchableOpacity>
@@ -147,13 +149,13 @@ export default function AddStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="person-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Basic Details</Text>
+            <Text style={styles.sectionTitle}>{t('dashboard.overview')}</Text>
           </View>
           {renderInput('First Name *', formData.first_name, 'first_name', 'Enter first name')}
           {renderInput('Last Name *', formData.last_name, 'last_name', 'Enter last name')}
-          {renderDatePickerTrigger('Date of Birth', formData.dob, () => setShowDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.dob, () => setShowDatePicker(true))}
           
-          <Text style={styles.inputLabel}>Gender</Text>
+          <Text style={styles.inputLabel}>{t('students.gender')}</Text>
           <View style={styles.genderRow}>
             {['Male', 'Female', 'Other'].map((g) => (
               <TouchableOpacity 
@@ -171,7 +173,7 @@ export default function AddStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="location-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Communication Details</Text>
+            <Text style={styles.sectionTitle}>{t('students.address')}</Text>
           </View>
           <View style={styles.row}>
             <View style={{ flex: 1, marginRight: 8 }}>
@@ -181,7 +183,7 @@ export default function AddStudentScreen() {
               {renderInput('Street', formData.street || '', 'street', 'Enter street name')}
             </View>
           </View>
-          {renderInput('Village', formData.village || '', 'village', 'Enter village')}
+          {renderInput(t('students.village_zone'), formData.village || '', 'village', 'Enter village')}
           {renderInput('City', formData.city || '', 'city', 'Enter city')}
           {renderInput('Pincode', formData.pincode || '', 'pincode', '600000', 'numeric', 6)}
         </View>
@@ -190,20 +192,20 @@ export default function AddStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="people-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Guardian Details</Text>
+            <Text style={styles.sectionTitle}>{t('students.guardian_info')}</Text>
           </View>
-          <Text style={styles.subSectionTitle}>Father's Details</Text>
+          <Text style={styles.subSectionTitle}>{t('students.father_name')}</Text>
           {renderInput('Name', formData.father_name || '', 'father_name', "Enter father's name")}
           {renderInput('Mobile', formData.father_mobile || '', 'father_mobile', '10 digit mobile', 'phone-pad', 10)}
-          {renderDatePickerTrigger('Date of Birth', formData.father_dob || '', () => setShowFatherDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.father_dob || '', () => setShowFatherDatePicker(true))}
           {renderInput('Aadhar', formData.father_aadhar || '', 'father_aadhar', '12 digit aadhar', 'numeric', 12)}
 
           <View style={styles.divider} />
           
-          <Text style={styles.subSectionTitle}>Mother's Details</Text>
+          <Text style={styles.subSectionTitle}>{t('students.mother_name')}</Text>
           {renderInput('Name', formData.mother_name || '', 'mother_name', "Enter mother's name")}
           {renderInput('Mobile', formData.mother_mobile || '', 'mother_mobile', '10 digit mobile', 'phone-pad', 10)}
-          {renderDatePickerTrigger('Date of Birth', formData.mother_dob || '', () => setShowMotherDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.mother_dob || '', () => setShowMotherDatePicker(true))}
           {renderInput('Aadhar', formData.mother_aadhar || '', 'mother_aadhar', '12 digit aadhar', 'numeric', 12)}
         </View>
 
@@ -211,7 +213,7 @@ export default function AddStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="call-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Emergency Contact</Text>
+            <Text style={styles.sectionTitle}>{t('students.emergency')}</Text>
           </View>
           {renderInput('Emergency Number', formData.emergency_contact || '', 'emergency_contact', '10 digit mobile', 'phone-pad', 10)}
         </View>
@@ -220,7 +222,7 @@ export default function AddStudentScreen() {
           {loading ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={styles.submitButtonText}>Register Student</Text>
+            <Text style={styles.submitButtonText}>{t('students.add_student')}</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
@@ -279,11 +281,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 4,
-  },
-  saveText: {
-    color: colors.primary,
-    fontWeight: '700',
-    fontSize: 16,
   },
   scrollContent: {
     padding: 10,

@@ -7,8 +7,10 @@ import { typography } from '../../../../theme/typography';
 import { getStudentById, updateStudent, Student } from '../../../../utils/database';
 import { useToast } from '../../../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 
 export default function EditStudentScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { showToast } = useToast();
@@ -32,7 +34,7 @@ export default function EditStudentScreen() {
           if (data) {
             setFormData(data);
           } else {
-            showToast('Student not found', 'error');
+            showToast(t('common.no_data'), 'error');
             router.back();
           }
         }
@@ -106,7 +108,7 @@ export default function EditStudentScreen() {
       <Text style={styles.inputLabel}>{label}</Text>
       <TouchableOpacity style={styles.input} onPress={onPress}>
         <Text style={{ color: value ? colors.text : '#999', fontSize: 16 }}>
-          {value || 'Select Date'}
+          {value || t('common.search')}
         </Text>
         <Ionicons name="calendar-outline" size={20} color={colors.primary} style={styles.inputIcon} />
       </TouchableOpacity>
@@ -127,7 +129,7 @@ export default function EditStudentScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <Text style={styles.headerTitle}>{t('students.edit')}</Text>
         <TouchableOpacity style={styles.backButton} onPress={handleUpdate} disabled={saving}>
           {saving ? (
             <ActivityIndicator size="small" color={colors.primary} />
@@ -145,13 +147,13 @@ export default function EditStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="person-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Basic Details</Text>
+            <Text style={styles.sectionTitle}>{t('dashboard.overview')}</Text>
           </View>
           {renderInput('First Name *', formData.first_name, 'first_name', 'Enter first name')}
           {renderInput('Last Name *', formData.last_name, 'last_name', 'Enter last name')}
-          {renderDatePickerTrigger('Date of Birth', formData.dob, () => setShowDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.dob, () => setShowDatePicker(true))}
           
-          <Text style={styles.inputLabel}>Gender</Text>
+          <Text style={styles.inputLabel}>{t('students.gender')}</Text>
           <View style={styles.genderRow}>
             {['Male', 'Female', 'Other'].map((g) => (
               <TouchableOpacity 
@@ -168,7 +170,7 @@ export default function EditStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="location-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Communication Details</Text>
+            <Text style={styles.sectionTitle}>{t('students.address')}</Text>
           </View>
           <View style={styles.row}>
             <View style={{ flex: 1, marginRight: 8 }}>
@@ -178,7 +180,7 @@ export default function EditStudentScreen() {
               {renderInput('Street', formData.street || '', 'street', 'Enter street name')}
             </View>
           </View>
-          {renderInput('Village', formData.village || '', 'village', 'Enter village')}
+          {renderInput(t('students.village_zone'), formData.village || '', 'village', 'Enter village')}
           {renderInput('City', formData.city || '', 'city', 'Enter city')}
           {renderInput('Pincode', formData.pincode || '', 'pincode', '600000', 'numeric', 6)}
         </View>
@@ -186,27 +188,27 @@ export default function EditStudentScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="people-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Guardian Details</Text>
+            <Text style={styles.sectionTitle}>{t('students.guardian_info')}</Text>
           </View>
-          <Text style={styles.subSectionTitle}>Father's Details</Text>
+          <Text style={styles.subSectionTitle}>{t('students.father_name')}</Text>
           {renderInput('Name', formData.father_name || '', 'father_name', "Enter father's name")}
           {renderInput('Mobile', formData.father_mobile || '', 'father_mobile', '10 digit mobile', 'phone-pad', 10)}
-          {renderDatePickerTrigger('Date of Birth', formData.father_dob || '', () => setShowFatherDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.father_dob || '', () => setShowFatherDatePicker(true))}
           {renderInput('Aadhar', formData.father_aadhar || '', 'father_aadhar', '12 digit aadhar', 'numeric', 12)}
 
           <View style={styles.divider} />
           
-          <Text style={styles.subSectionTitle}>Mother's Details</Text>
+          <Text style={styles.subSectionTitle}>{t('students.mother_name')}</Text>
           {renderInput('Name', formData.mother_name || '', 'mother_name', "Enter mother's name")}
           {renderInput('Mobile', formData.mother_mobile || '', 'mother_mobile', '10 digit mobile', 'phone-pad', 10)}
-          {renderDatePickerTrigger('Date of Birth', formData.mother_dob || '', () => setShowMotherDatePicker(true))}
+          {renderDatePickerTrigger(t('students.dob'), formData.mother_dob || '', () => setShowMotherDatePicker(true))}
           {renderInput('Aadhar', formData.mother_aadhar || '', 'mother_aadhar', '12 digit aadhar', 'numeric', 12)}
         </View>
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Ionicons name="call-outline" size={20} color={colors.primary} />
-            <Text style={styles.sectionTitle}>Emergency Contact</Text>
+            <Text style={styles.sectionTitle}>{t('students.emergency')}</Text>
           </View>
           {renderInput('Emergency Number', formData.emergency_contact || '', 'emergency_contact', '10 digit mobile', 'phone-pad', 10)}
         </View>
@@ -215,7 +217,7 @@ export default function EditStudentScreen() {
           {saving ? (
             <ActivityIndicator color={colors.white} />
           ) : (
-            <Text style={styles.submitButtonText}>Update Changes</Text>
+            <Text style={styles.submitButtonText}>{t('students.edit')}</Text>
           )}
         </TouchableOpacity>
       </ScrollView>
