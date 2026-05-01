@@ -9,7 +9,10 @@ export default function TabLayout() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const isSettings = pathname === '/settings';
+  
+  // Define routes where tabs should be visible
+  const tabRoutes = ['/', '/attendance', '/students', '/messages', '/settings'];
+  const showTabs = tabRoutes.includes(pathname);
 
   if (!isLoading && !user) {
     return <Redirect href="/(auth)/login" />;
@@ -26,20 +29,21 @@ export default function TabLayout() {
           borderTopColor: '#F0F0F0',
           height: Platform.OS === 'ios' ? 85 : 65,
           paddingBottom: Platform.OS === 'ios' ? 25 : 10,
+          display: showTabs ? 'flex' : 'none',
         },
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '700',
           marginBottom: 2,
         },
-        headerShown: true,
+        headerShown: showTabs,
         headerTitle: 'SmartAngan',
         headerLeft: () => {
           if (pathname === '/') return null;
           return (
             <TouchableOpacity
               style={{ marginLeft: 20 }}
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.back()}
             >
               <Ionicons
                 name="chevron-back"

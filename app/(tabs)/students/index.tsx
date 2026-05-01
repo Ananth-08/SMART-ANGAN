@@ -52,44 +52,52 @@ export default function StudentsScreen() {
 
   const renderStudentItem = ({ item }: { item: Student }) => (
     <View style={styles.studentCard}>
-      <View style={styles.cardMain}>
-        <View style={styles.avatarContainer}>
-          {item.profile_image ? (
-            <Image source={{ uri: item.profile_image }} style={styles.avatar} />
-          ) : (
-            <Ionicons name="person" size={30} color={colors.primary} />
-          )}
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.nameText}>{item.first_name} {item.last_name}</Text>
-          <Text style={styles.idText}>{item.student_id}</Text>
-          <View style={styles.tagRow}>
-            <View style={styles.genderTag}>
-              <Text style={styles.tagText}>{item.gender}</Text>
-            </View>
-            <View style={styles.cityTag}>
-              <Text style={styles.tagText}>{item.city || 'No City'}</Text>
+      <TouchableOpacity 
+        activeOpacity={0.7}
+        onPress={() => router.push(`/(tabs)/students/${item.id}`)}
+      >
+        <View style={styles.cardMain}>
+          <View style={styles.avatarContainer}>
+            {item.profile_image ? (
+              <Image source={{ uri: item.profile_image }} style={styles.avatar} />
+            ) : (
+              <Ionicons name="person" size={30} color={colors.primary} />
+            )}
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.nameText}>{item.first_name} {item.last_name}</Text>
+            <Text style={styles.idText}>{item.student_id}</Text>
+            <View style={styles.tagRow}>
+              <View style={styles.genderTag}>
+                <Text style={styles.tagText}>{item.gender}</Text>
+              </View>
+              <View style={styles.cityTag}>
+                <Text style={styles.tagText}>{item.city || 'No City'}</Text>
+              </View>
             </View>
           </View>
+          <View style={styles.qrContainer}>
+            <QRCode
+              value={item.student_id || ''}
+              size={40}
+              color="#000"
+              backgroundColor="transparent"
+            />
+          </View>
         </View>
-        <View style={styles.qrContainer}>
-          <QRCode
-            value={item.student_id || ''}
-            size={40}
-            color="#000"
-            backgroundColor="transparent"
-          />
-        </View>
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.cardFooter}>
         <TouchableOpacity style={styles.actionButton} onPress={() => handleDelete(item.id!)}>
           <Ionicons name="trash-outline" size={18} color={colors.error} />
           <Text style={[styles.actionText, { color: colors.error }]}>Delete</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => router.push(`/(tabs)/students/${item.id}`)}
+        >
           <Ionicons name="create-outline" size={18} color={colors.primary} />
-          <Text style={[styles.actionText, { color: colors.primary }]}>Edit</Text>
+          <Text style={[styles.actionText, { color: colors.primary }]}>View</Text>
         </TouchableOpacity>
       </View>
     </View>

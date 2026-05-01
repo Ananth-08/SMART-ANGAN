@@ -128,7 +128,15 @@ export default function AddStudentScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header Removed */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Register Student</Text>
+        <TouchableOpacity style={styles.backButton} onPress={resetForm}>
+          <Ionicons name="refresh-outline" size={22} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
 
       <ScrollView 
         ref={scrollRef}
@@ -256,7 +264,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 15,
     paddingBottom: 20,
     backgroundColor: colors.white,
     borderBottomWidth: 1,
