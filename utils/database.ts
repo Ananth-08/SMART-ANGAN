@@ -118,6 +118,14 @@ export const initDatabase = async () => {
       notes TEXT,
       FOREIGN KEY (student_db_id) REFERENCES students (id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS meals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      student_db_id INTEGER,
+      date TEXT,
+      meal_type TEXT,
+      FOREIGN KEY(student_db_id) REFERENCES students(id)
+    );
   `);
   return db;
 };
@@ -309,4 +317,63 @@ export const getVaccinationRecords = async (student_db_id: number) => {
     'SELECT * FROM vaccination_records WHERE student_db_id = ? ORDER BY date DESC',
     [student_db_id]
   );
+};
+
+export const addMeal = async (student_db_id: number, meal_type: string) => {
+  if (Platform.OS === 'web') return;
+  const db = await getDb();
+  const dateStr = new Date().toISOString().split('T')[0];
+  await db.runAsync(
+    'INSERT INTO meals (student_db_id, date, meal_type) VALUES (?, ?, ?)',
+    [student_db_id, dateStr, meal_type]
+  );
+};
+
+export const getMeals = async (student_db_id: number) => {
+  if (Platform.OS === 'web') return [];
+  const db = await getDb();
+  return await db.getAllAsync<{ id: number, date: string, meal_type: string }>(
+    'SELECT * FROM meals WHERE student_db_id = ? ORDER BY date DESC',
+    [student_db_id]
+  );
+};
+
+export const getMealsCountByDate = async (date: string) => {
+  if (Platform.OS === 'web') return 0;
+  const db = await getDb();
+  const result = await db.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM meals WHERE date = ?',
+    [date]
+  );
+  return result?.count || 0;
+};
+
+export const getHealthAlertsCount = async () => {
+  if (Platform.OS === 'web') return 0;
+  const db = await getDb();
+  const result = await db.getFirstAsync<{ count: number }>(
+    "SELECT COUNT(*) as count FROM health_records WHERE status IN ('SAM', 'MAM')"
+  );
+  return result?.count || 0;
+};
+
+export const getRecentActivity = async () => {
+  if (Platform.OS === 'web') return [];
+  const db = await getDb();
+  
+  const activities = await db.getAllAsync<any>(`
+    SELECT 'health' as type, s.first_name || ' ' || s.last_name as student_name, h.date, h.status as detail
+    FROM health_records h
+    JOIN students s ON h.student_db_id = s.id
+    UNION ALL
+    SELECT 'vaccine' as type, s.first_name || ' ' || s.last_name as student_name, v.date, v.vaccine_name as detail
+    FROM vaccination_records v
+    JOIN students s ON v.student_db_id = s.id
+    UNION ALL
+    SELECT 'meal' as type, s.first_name || ' ' || s.last_name as student_name, m.date, m.meal_type as detail
+    FROM meals m
+    JOIN students s ON m.student_db_id = s.id
+    ORDER BY date DESC LIMIT 8
+  `);
+  return activities;
 };

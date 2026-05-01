@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Alert, Linking, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Alert, Linking, ActivityIndicator, TextInput } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -11,9 +11,11 @@ import * as SMS from 'expo-sms';
 export default function MessagesScreen() {
   const { showToast } = useToast();
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [attendance, setAttendance] = useState<Record<number, string>>({});
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -29,6 +31,7 @@ export default function MessagesScreen() {
       });
 
       setStudents(studentList);
+      setFilteredStudents(studentList);
       setAttendance(attendanceMap);
     } catch (error) {
       console.error(error);
@@ -43,6 +46,20 @@ export default function MessagesScreen() {
       fetchData();
     }, [])
   );
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredStudents(students);
+    } else {
+      const filtered = students.filter(s => 
+        s.first_name.toLowerCase().includes(query.toLowerCase()) || 
+        s.last_name.toLowerCase().includes(query.toLowerCase()) ||
+        s.student_id.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredStudents(filtered);
+    }
+  };
 
   const toggleSelect = (id: number) => {
     const newSelected = new Set(selectedIds);
@@ -204,18 +221,34 @@ export default function MessagesScreen() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search guardians or students..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+          placeholderTextColor="#94A3B8"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => handleSearch('')}>
+            <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 50 }} />
       ) : (
         <FlatList
-          data={students}
+          data={filteredStudents}
           renderItem={renderStudentItem}
           keyExtractor={item => item.id!.toString()}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="chatbubbles-outline" size={60} color="#DDD" />
-              <Text style={styles.emptyText}>No students to message</Text>
+              <Text style={styles.emptyText}>{searchQuery ? 'No matching contacts' : 'No students to message'}</Text>
             </View>
           }
         />
@@ -228,6 +261,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    marginHorizontal: 20,
+    marginTop: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    height: 44,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.text,
+    fontWeight: '500',
   },
   topBar: {
     flexDirection: 'row',

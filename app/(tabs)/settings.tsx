@@ -66,7 +66,7 @@ export default function SettingsScreen() {
       {/* Pi Hub Sync Card */}
       <View style={styles.syncCard}>
         <Text style={styles.syncDescription}>
-          {t('settings.sync_desc')}
+          the cloud was not sync
         </Text>
         <TouchableOpacity style={styles.syncButton} onPress={handleSync} disabled={syncing}>
           <MaterialCommunityIcons name="swap-horizontal" size={20} color={colors.white} />

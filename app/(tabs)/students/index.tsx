@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
@@ -12,16 +12,16 @@ export default function StudentsScreen() {
   const router = useRouter();
   const { showToast } = useToast();
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchStudents = async () => {
     try {
       const data = await getStudents();
-      console.log('--- Stored Students Details ---');
-      console.log(JSON.stringify(data, null, 2));
-      console.log('-------------------------------');
       setStudents(data);
+      setFilteredStudents(data);
     } catch (error) {
       console.error(error);
       showToast('Failed to load students', 'error');
@@ -34,6 +34,20 @@ export default function StudentsScreen() {
   useEffect(() => {
     fetchStudents();
   }, []);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredStudents(students);
+    } else {
+      const filtered = students.filter(s => 
+        s.first_name.toLowerCase().includes(query.toLowerCase()) || 
+        s.last_name.toLowerCase().includes(query.toLowerCase()) ||
+        s.student_id.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredStudents(filtered);
+    }
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -105,13 +119,28 @@ export default function StudentsScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name or student ID..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+          placeholderTextColor="#94A3B8"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => handleSearch('')}>
+            <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 50 }} />
       ) : (
         <View style={{ flex: 1 }}>
           <FlatList
-            data={students}
+            data={filteredStudents}
             renderItem={renderStudentItem}
             keyExtractor={(item) => item.id!.toString()}
             contentContainerStyle={styles.listContent}
@@ -121,13 +150,15 @@ export default function StudentsScreen() {
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Ionicons name="people-outline" size={80} color="#DDD" />
-                <Text style={styles.emptyText}>No students registered yet</Text>
-                <TouchableOpacity
-                  style={styles.emptyAddButton}
-                  onPress={() => router.push('/(tabs)/students/add')}
-                >
-                  <Text style={styles.emptyAddText}>Register First Student</Text>
-                </TouchableOpacity>
+                <Text style={styles.emptyText}>{searchQuery ? 'No matching students found' : 'No students registered yet'}</Text>
+                {!searchQuery && (
+                  <TouchableOpacity
+                    style={styles.emptyAddButton}
+                    onPress={() => router.push('/(tabs)/students/add')}
+                  >
+                    <Text style={styles.emptyAddText}>Register First Student</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             }
           />
@@ -149,6 +180,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F7F9FB',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    margin: 16,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    height: 50,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '500',
   },
   topHeader: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Platform, TextInput } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -17,11 +17,13 @@ export default function AttendanceScreen() {
   const { showToast } = useToast();
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [attendance, setAttendance] = useState<Record<number, 'Present' | 'Absent'>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const dateString = selectedDate.toISOString().split('T')[0];
 
@@ -38,7 +40,6 @@ export default function AttendanceScreen() {
       const attendanceData = await getAttendanceByDate(dateString);
       
       const attendanceMap: Record<number, 'Present' | 'Absent'> = {};
-      // Initialize with 'Absent' or from database
       studentList.forEach(s => {
         attendanceMap[s.id!] = 'Absent';
       });
@@ -48,12 +49,27 @@ export default function AttendanceScreen() {
       });
 
       setStudents(studentList);
+      setFilteredStudents(studentList);
       setAttendance(attendanceMap);
     } catch (error) {
       console.error(error);
       showToast('Failed to load data', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredStudents(students);
+    } else {
+      const filtered = students.filter(s => 
+        s.first_name.toLowerCase().includes(query.toLowerCase()) || 
+        s.last_name.toLowerCase().includes(query.toLowerCase()) ||
+        s.student_id.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredStudents(filtered);
     }
   };
 
@@ -138,6 +154,22 @@ export default function AttendanceScreen() {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search students..."
+          value={searchQuery}
+          onChangeText={handleSearch}
+          placeholderTextColor="#94A3B8"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => handleSearch('')}>
+            <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+          </TouchableOpacity>
+        )}
+      </View>
+
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 50 }} />
       ) : (
@@ -162,14 +194,14 @@ export default function AttendanceScreen() {
           </View>
 
           <FlatList
-            data={students}
+            data={filteredStudents}
             renderItem={renderStudentItem}
             keyExtractor={item => item.id!.toString()}
             contentContainerStyle={styles.listContent}
             ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Ionicons name="people-outline" size={60} color="#DDD" />
-                <Text style={styles.emptyText}>No students to show</Text>
+                <Text style={styles.emptyText}>{searchQuery ? 'No matching students' : 'No students to show'}</Text>
               </View>
             }
           />
@@ -209,6 +241,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8FAFC',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    marginHorizontal: 20,
+    marginTop: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    height: 44,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.text,
+    fontWeight: '500',
   },
   topBar: {
     flexDirection: 'row',

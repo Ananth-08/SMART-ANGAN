@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../../theme/colors';
 import { typography } from '../../../theme/typography';
-import { getStudentById, Student, addHealthRecord, getHealthRecords, addVaccinationRecord, getVaccinationRecords } from '../../../utils/database';
+import { getStudentById, Student, addHealthRecord, getHealthRecords, addVaccinationRecord, getVaccinationRecords, addMeal, getMeals } from '../../../utils/database';
 import QRCode from 'react-native-qrcode-svg';
 import { useToast } from '../../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -42,6 +42,7 @@ export default function StudentDetailsScreen() {
   // Health State
   const [healthRecords, setHealthRecords] = useState<HealthRecord[]>([]);
   const [vaccinationRecords, setVaccinationRecords] = useState<VaccineRecord[]>([]);
+  const [mealRecords, setMealRecords] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showVaccineModal, setShowVaccineModal] = useState(false);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
@@ -66,8 +67,10 @@ export default function StudentDetailsScreen() {
         if (data) {
           const hRecords = await getHealthRecords(Number(id));
           const vRecords = await getVaccinationRecords(Number(id));
+          const mRecords = await getMeals(Number(id));
           setHealthRecords(hRecords);
           setVaccinationRecords(vRecords);
+          setMealRecords(mRecords);
         }
       }
     } catch (error) {
@@ -126,6 +129,15 @@ export default function StudentDetailsScreen() {
       setVaccineName(''); setVaccineNotes(''); setRecordDate(new Date());
       fetchStudentData();
     } catch (error) { showToast('Failed to add vaccine', 'error'); }
+  };
+
+  const handleProvideMeal = async () => {
+    try {
+      await addMeal(Number(id), 'Standard Balanced Meal');
+      showToast('Meal provided recorded', 'success');
+      const mRecords = await getMeals(Number(id));
+      setMealRecords(mRecords);
+    } catch (error) { showToast('Failed to record meal', 'error'); }
   };
 
   const downloadAsPDF = async (type: 'QR' | 'ID') => {
@@ -222,9 +234,23 @@ export default function StudentDetailsScreen() {
               <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAnalysisModal(true)}><Ionicons name="bar-chart-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Analysis</Text></TouchableOpacity>
               <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowAddModal(true)}><Ionicons name="fitness-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Growth</Text></TouchableOpacity>
               <TouchableOpacity style={styles.viewAnalysisButton} onPress={() => setShowVaccineModal(true)}><Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Vaccine</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.viewAnalysisButton} onPress={handleProvideMeal}><Ionicons name="restaurant-outline" size={18} color={colors.primary} /><Text style={styles.analysisText}>Meal</Text></TouchableOpacity>
             </View>
 
-            <Text style={styles.historyTitle}>Growth History</Text>
+            <Text style={styles.historyTitle}>Nutrition History</Text>
+            {mealRecords.slice(0, 3).map((record) => (
+              <View key={record.id} style={styles.historyItem}>
+                <View style={[styles.historyIcon, { backgroundColor: '#FFF3E0' }]}><Ionicons name="restaurant" size={24} color="#EF6C00" /></View>
+                <View style={styles.historyInfo}>
+                  <Text style={styles.historyDate}>{new Date(record.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
+                  <Text style={styles.historyMetrics}>{record.meal_type}</Text>
+                </View>
+                <View style={[styles.statusTag, { backgroundColor: '#FFF3E0' }]}><Text style={[styles.statusTagText, { color: '#EF6C00' }]}>Provided</Text></View>
+              </View>
+            ))}
+            {mealRecords.length === 0 && <View style={styles.emptyCard}><Text style={styles.emptyText}>No meals recorded for this student</Text></View>}
+
+            <Text style={[styles.historyTitle, { marginTop: 20 }]}>Growth History</Text>
             {healthRecords.slice(0, 3).map((record) => {
               const { color } = calculateStatus(record.height, record.weight);
               return (
