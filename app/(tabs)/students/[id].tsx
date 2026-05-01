@@ -10,7 +10,7 @@ import { useToast } from '../../../context/ToastContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const { width } = Dimensions.get('window');
 
@@ -125,41 +125,171 @@ export default function StudentDetailsScreen() {
       </html>
     ` : `
       <html>
-        <body style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif; background-color: #f7f9fb;">
-          <div style="width: 400px; background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #eee;">
-            <div style="background: #0A3327; padding: 30px; text-align: center; color: white;">
-              <h2 style="margin: 0; letter-spacing: 2px;">SMART ANGAN</h2>
-              <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.8;">Professional Digital ID</p>
+        <head>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+            body { 
+              margin: 0; 
+              padding: 0; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center; 
+              height: 100vh; 
+              background-color: #f0f2f5; 
+              font-family: 'Inter', sans-serif; 
+            }
+            .card {
+              width: 350px;
+              height: 550px;
+              background: white;
+              border-radius: 24px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+              overflow: hidden;
+              position: relative;
+              display: flex;
+              flex-direction: column;
+            }
+            .header {
+              background: #0A3327;
+              height: 120px;
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              color: white;
+            }
+            .header h2 {
+              margin: 0;
+              font-size: 20px;
+              letter-spacing: 3px;
+              font-weight: 800;
+            }
+            .header p {
+              margin: 4px 0 0;
+              font-size: 10px;
+              opacity: 0.7;
+              letter-spacing: 1px;
+            }
+            .qr-container {
+              width: 140px;
+              height: 140px;
+              background: white;
+              margin-top: -70px;
+              align-self: center;
+              border-radius: 20px;
+              padding: 10px;
+              box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+              z-index: 10;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .content {
+              padding: 20px 30px;
+              text-align: center;
+              flex-grow: 1;
+            }
+            .name {
+              font-size: 24px;
+              font-weight: 800;
+              color: #1a1a1a;
+              margin: 10px 0 4px;
+            }
+            .id-tag {
+              font-size: 16px;
+              font-weight: 600;
+              color: #0A3327;
+              margin-bottom: 24px;
+            }
+            .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+              text-align: left;
+              margin-bottom: 24px;
+            }
+            .info-item label {
+              display: block;
+              font-size: 9px;
+              font-weight: 600;
+              color: #999;
+              text-transform: uppercase;
+              margin-bottom: 4px;
+            }
+            .info-item span {
+              display: block;
+              font-size: 13px;
+              font-weight: 600;
+              color: #333;
+            }
+            .footer {
+              background: #f8f9fa;
+              padding: 20px;
+              border-top: 1px solid #eee;
+              text-align: left;
+            }
+            .footer-label {
+              font-size: 9px;
+              font-weight: 600;
+              color: #999;
+              margin-bottom: 4px;
+            }
+            .footer-value {
+              font-size: 14px;
+              font-weight: 700;
+              color: #D32F2F;
+            }
+            .org-stamp {
+              position: absolute;
+              bottom: 20px;
+              right: 20px;
+              font-size: 8px;
+              color: #ccc;
+              transform: rotate(-15deg);
+              border: 1px solid #eee;
+              padding: 4px 8px;
+              border-radius: 4px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <div class="header">
+              <h2>SMART ANGAN</h2>
+              <p>OFFICIAL STUDENT PASS</p>
             </div>
-            <div style="padding: 40px; text-align: center;">
-              <div style="width: 140px; height: 140px; background: white; border: 2px solid #0A3327; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; padding: 10px;">
-                <img src="${qrData}" style="width: 100%; height: 100%;" />
-              </div>
-              <h1 style="margin: 0; color: #333; font-size: 28px;">${student.first_name} ${student.last_name}</h1>
-              <p style="color: #0A3327; font-weight: bold; margin: 10px 0; font-size: 18px;">${student.student_id}</p>
+            <div class="qr-container">
+              <img src="${qrData}" style="width: 100%; height: 100%;" />
+            </div>
+            <div class="content">
+              <div class="name">${student.first_name} ${student.last_name}</div>
+              <div class="id-tag">${student.student_id}</div>
               
-              <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #f0f0f0; display: grid; grid-template-columns: 1fr 1fr; text-align: left; gap: 15px;">
-                 <div>
-                    <p style="margin: 0; font-size: 10px; color: #999;">GENDER</p>
-                    <p style="margin: 0; font-weight: bold; font-size: 14px;">${student.gender}</p>
-                 </div>
-                 <div>
-                    <p style="margin: 0; font-size: 10px; color: #999;">DOB</p>
-                    <p style="margin: 0; font-weight: bold; font-size: 14px;">${student.dob}</p>
-                 </div>
-                 <div>
-                    <p style="margin: 0; font-size: 10px; color: #999;">VILLAGE</p>
-                    <p style="margin: 0; font-weight: bold; font-size: 14px;">${student.village || 'N/A'}</p>
-                 </div>
-                 <div>
-                    <p style="margin: 0; font-size: 10px; color: #999;">ZONE</p>
-                    <p style="margin: 0; font-weight: bold; font-size: 14px;">${student.zone || 'N/A'}</p>
-                 </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Gender</label>
+                  <span>${student.gender}</span>
+                </div>
+                <div class="info-item">
+                  <label>Date of Birth</label>
+                  <span>${student.dob}</span>
+                </div>
+                <div class="info-item">
+                  <label>Village</label>
+                  <span>${student.village || 'N/A'}</span>
+                </div>
+                <div class="info-item">
+                  <label>Zone</label>
+                  <span>${student.zone || 'N/A'}</span>
+                </div>
               </div>
             </div>
-            <div style="background: #f1f5f9; padding: 15px; text-align: center; font-size: 10px; color: #666;">
-              Property of SMART ANGAN • Valid through 2026-27 Session
+            <div class="footer">
+              <div class="footer-label">EMERGENCY CONTACT</div>
+              <div class="footer-value">${student.emergency_contact || student.father_mobile || 'N/A'}</div>
             </div>
+            <div class="org-stamp">VALID SESSION 2026-27</div>
           </div>
         </body>
       </html>
