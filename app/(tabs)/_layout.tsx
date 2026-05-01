@@ -84,6 +84,13 @@ export default function TabLayout() {
             <Ionicons name={focused ? 'people' : 'people-outline'} size={24} color={color} />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Prevent default behavior and force navigation to the index
+            e.preventDefault();
+            navigation.navigate('students', { screen: 'index' });
+          },
+        })}
       />
       <Tabs.Screen
         name="messages"

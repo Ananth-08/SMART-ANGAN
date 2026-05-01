@@ -39,7 +39,9 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-sqlite",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

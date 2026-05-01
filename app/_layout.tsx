@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
+import { initDatabase } from '../utils/database';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,6 +36,8 @@ export default function RootLayout() {
 
         // Load saved language
         await loadSavedLanguage();
+        // Initialize Database
+        await initDatabase();
         // Pre-load fonts, make any API calls you need to do here
         await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (e) {
