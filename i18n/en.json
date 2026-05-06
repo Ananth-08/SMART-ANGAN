@@ -97,5 +97,12 @@
     "help": "Help & Training Material",
     "tech_support": "Technical Support",
     "privacy": "Privacy Policy"
+  },
+  "health_drive": {
+    "scan_student": "Please scan the student's QR code to begin.",
+    "step_on_scale": "Please ask the child to step on the weighing scale.",
+    "infant_mode_mother": "Infant mode activated. Mother, please step on the scale alone first.",
+    "infant_mode_baby": "Now, please hold the baby and step on the scale again.",
+    "muac_scan": "Please scan the child's MUAC tape now."
   }
 }

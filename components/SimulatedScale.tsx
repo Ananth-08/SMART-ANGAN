@@ -1,27 +1,51 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
+import { speakInstruction } from '../utils/audio';
 
 interface SimulatedScaleProps {
   onDataReceived: (height: number, weight: number) => void;
   isConnected: boolean;
+  isInfantMode: boolean;
+  onToggleInfantMode: (val: boolean) => void;
 }
 
-export default function SimulatedScale({ onDataReceived, isConnected }: SimulatedScaleProps) {
+export default function SimulatedScale({ onDataReceived, isConnected, isInfantMode, onToggleInfantMode }: SimulatedScaleProps) {
   const [isSimulating, setIsSimulating] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [motherWeight, setMotherWeight] = useState<number | null>(null);
 
   const simulateReading = () => {
     setIsSimulating(true);
-    // Simulate real-world delay of a child stepping on scale and it stabilizing
     setTimeout(() => {
-      // Generate some realistic numbers
-      const mockHeight = parseFloat((Math.random() * (120 - 70) + 70).toFixed(1));
-      const mockWeight = parseFloat((Math.random() * (25 - 8) + 8).toFixed(1));
-      
       setIsSimulating(false);
-      onDataReceived(mockHeight, mockWeight);
+      
+      if (!isInfantMode) {
+        const mockHeight = parseFloat((Math.random() * (120 - 70) + 70).toFixed(1));
+        const mockWeight = parseFloat((Math.random() * (25 - 8) + 8).toFixed(1));
+        onDataReceived(mockHeight, mockWeight);
+      } else {
+        if (step === 1) {
+          const mWeight = parseFloat((Math.random() * (80 - 50) + 50).toFixed(1));
+          setMotherWeight(mWeight);
+          setStep(2);
+          speakInstruction('health_drive.infant_mode_baby');
+        } else {
+          const infantWeight = parseFloat((Math.random() * (15 - 3) + 3).toFixed(1));
+          // Pass 0 for height because infant height (length) is measured manually via infantometer
+          onDataReceived(0, parseFloat(infantWeight.toFixed(1)));
+          setStep(1);
+          setMotherWeight(null);
+        }
+      }
     }, 2000);
+  };
+
+  const handleToggleInfantMode = (val: boolean) => {
+    onToggleInfantMode(val);
+    setStep(1);
+    setMotherWeight(null);
   };
 
   if (!isConnected) {
@@ -39,9 +63,18 @@ export default function SimulatedScale({ onDataReceived, isConnected }: Simulate
         <Ionicons name="bluetooth" size={24} color="#2E7D32" />
         <Text style={styles.connectedText}>Smart Scale Connected</Text>
       </View>
+      <View style={styles.infantToggleContainer}>
+        <Text style={styles.infantToggleText}>Infant Tare Mode (0-2 Yrs)</Text>
+        <Switch 
+          value={isInfantMode} 
+          onValueChange={handleToggleInfantMode} 
+          trackColor={{ false: '#CBD5E1', true: '#A5D6A7' }}
+          thumbColor={isInfantMode ? '#2E7D32' : '#F8FAFC'}
+        />
+      </View>
       
       <Text style={styles.instruction}>
-        {isSimulating ? "Waiting for stability..." : "Ready for next child"}
+        {isSimulating ? "Waiting for stability..." : (isInfantMode ? (step === 1 ? "Step 1: Mother stands alone" : `Step 2: Mother holds infant (Mother: ${motherWeight}kg)`) : "Ready for next child")}
       </Text>
 
       <TouchableOpacity 
@@ -53,8 +86,8 @@ export default function SimulatedScale({ onDataReceived, isConnected }: Simulate
           <ActivityIndicator color={colors.white} />
         ) : (
           <>
-            <Ionicons name="footsteps" size={20} color={colors.white} style={{ marginRight: 8 }} />
-            <Text style={styles.buttonText}>Simulate Child on Scale</Text>
+            <Ionicons name={isInfantMode ? (step === 1 ? "woman" : "people") : "footsteps"} size={20} color={colors.white} style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>{isInfantMode ? (step === 1 ? "Simulate Mother Weight" : "Simulate Mother + Infant") : "Simulate Child on Scale"}</Text>
           </>
         )}
       </TouchableOpacity>
@@ -125,5 +158,21 @@ const styles = StyleSheet.create({
     marginTop: 12,
     opacity: 0.8,
     textAlign: 'center',
+  },
+  infantToggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F1F5F9',
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  infantToggleText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#334155',
   }
 });

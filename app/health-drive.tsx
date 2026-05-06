@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert, Platform } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Platform, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import SimulatedScale from '../components/SimulatedScale';
+import MUACScannerModal from '../components/MUACScannerModal';
 import { getStudentByStudentId, Student, addHealthRecord } from '../utils/database';
 import { calculateWHOZScore, calculateAgeInMonths } from '../utils/zScore';
 import { useToast } from '../context/ToastContext';
+import { speakInstruction, stopSpeech } from '../utils/audio';
 
 export default function HealthDriveScreen() {
   const router = useRouter();
@@ -17,6 +19,23 @@ export default function HealthDriveScreen() {
   const [isScaleConnected, setIsScaleConnected] = useState(false);
   const [scannedStudent, setScannedStudent] = useState<Student | null>(null);
   const [isScanning, setIsScanning] = useState(true);
+  const [isInfantMode, setIsInfantMode] = useState(false);
+  const [showMUACScanner, setShowMUACScanner] = useState(false);
+  const [isManualEntry, setIsManualEntry] = useState(false);
+  const [manualHeight, setManualHeight] = useState('');
+  const [manualWeight, setManualWeight] = useState('');
+
+  useEffect(() => {
+    // Speak intro instructions when screen opens
+    const timer = setTimeout(() => {
+      speakInstruction('health_drive.scan_student');
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+      stopSpeech();
+    };
+  }, []);
 
   if (!permission) return <View />;
   if (!permission.granted) {
@@ -32,14 +51,30 @@ export default function HealthDriveScreen() {
     if (!isScanning) return;
     setIsScanning(false);
     
-    // Attempt to lookup student by the scanned QR string
     const student = await getStudentByStudentId(data);
     if (student) {
       setScannedStudent(student);
-      showToast(`Student Identified: ${student.first_name}`, 'success');
+      
+      let ageInMonths = 24;
+      if (student.dob) {
+        ageInMonths = calculateAgeInMonths(student.dob);
+      }
+      
+      if (ageInMonths < 24) {
+        setIsInfantMode(true);
+        showToast(`Infant Detected: ${student.first_name} (${ageInMonths} mo)`, 'success');
+        speakInstruction('health_drive.infant_mode_mother');
+      } else {
+        setIsInfantMode(false);
+        showToast(`Student Identified: ${student.first_name}`, 'success');
+        speakInstruction('health_drive.step_on_scale');
+      }
     } else {
       Alert.alert('Not Found', 'This QR code does not belong to any student in the local database.', [
-        { text: 'Try Again', onPress: () => setIsScanning(true) }
+        { text: 'Try Again', onPress: () => {
+            setIsScanning(true);
+            speakInstruction('health_drive.scan_student');
+        }}
       ]);
     }
   };
@@ -50,13 +85,24 @@ export default function HealthDriveScreen() {
       return;
     }
 
+    let finalHeight = height;
+
+    // If it's an infant, we MUST use the manual height input since they can't stand on a height sensor
+    if (isInfantMode) {
+      if (!manualHeight || parseFloat(manualHeight) <= 0) {
+        Alert.alert("Missing Height", "Infant length cannot be measured by the scale. Please enter the infant's length (cm) manually in the input box provided.");
+        return;
+      }
+      finalHeight = parseFloat(manualHeight);
+    }
+
     // Calculate Z-Score
     let ageInMonths = 24;
     if (scannedStudent.dob) {
       ageInMonths = calculateAgeInMonths(scannedStudent.dob);
     }
     
-    const { status, zScore } = calculateWHOZScore(height, weight, ageInMonths, scannedStudent.gender || 'Other');
+    const { status, zScore } = calculateWHOZScore(finalHeight, weight, ageInMonths, scannedStudent.gender || 'Other');
     
     // Save to Database
     const today = new Date().toISOString().split('T')[0];
@@ -65,7 +111,7 @@ export default function HealthDriveScreen() {
       await addHealthRecord({
         student_db_id: scannedStudent.id!,
         date: today,
-        height,
+        height: finalHeight,
         weight,
         status,
         z_score: zScore
@@ -73,10 +119,12 @@ export default function HealthDriveScreen() {
 
       Alert.alert(
         'Success!', 
-        `Recorded for ${scannedStudent.first_name}\nHeight: ${height}cm\nWeight: ${weight}kg\nStatus: ${status}`,
+        `Recorded for ${scannedStudent.first_name}\nHeight: ${finalHeight}cm\nWeight: ${weight}kg\nStatus: ${status}`,
         [{ text: 'Next Child', onPress: () => {
           setScannedStudent(null);
           setIsScanning(true);
+          setManualHeight(''); // Reset height
+          speakInstruction('health_drive.scan_student');
         }}]
       );
 
@@ -138,10 +186,89 @@ export default function HealthDriveScreen() {
 
       {/* Scale Interface Section */}
       <View style={styles.scaleSection}>
-        <SimulatedScale 
-          isConnected={isScaleConnected} 
-          onDataReceived={handleDataReceived} 
-        />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: colors.text }}>
+            {isManualEntry ? "Manual Entry" : "IoT Integration"}
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity 
+              style={{ backgroundColor: '#F1F5F9', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}
+              onPress={() => setIsManualEntry(!isManualEntry)}
+            >
+              <Ionicons name={isManualEntry ? "bluetooth" : "create"} size={16} color={colors.textSecondary} style={{ marginRight: 4 }} />
+              <Text style={{ color: colors.textSecondary, fontWeight: '700', fontSize: 12 }}>
+                {isManualEntry ? "Switch to IoT" : "Manual"}
+              </Text>
+            </TouchableOpacity>
+            {!isManualEntry && (
+              <TouchableOpacity 
+                style={{ backgroundColor: '#E8F5E9', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, gap: 4 }}
+                onPress={() => {
+                  setShowMUACScanner(true);
+                  speakInstruction('health_drive.muac_scan');
+                }}
+              >
+                <Ionicons name="camera" size={16} color="#2E7D32" />
+                <Text style={{ color: '#2E7D32', fontWeight: '700', fontSize: 12 }}>MUAC Scan</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {isManualEntry ? (
+          <View style={{ gap: 12, marginTop: 5, marginBottom: 20 }}>
+            <TextInput 
+              style={{ borderWidth: 1, borderColor: '#E2E8F0', padding: 14, borderRadius: 12, fontSize: 16 }} 
+              placeholder="Height (cm)" 
+              keyboardType="numeric" 
+              value={manualHeight}
+              onChangeText={setManualHeight} 
+            />
+            <TextInput 
+              style={{ borderWidth: 1, borderColor: '#E2E8F0', padding: 14, borderRadius: 12, fontSize: 16 }} 
+              placeholder="Weight (kg)" 
+              keyboardType="numeric" 
+              value={manualWeight}
+              onChangeText={setManualWeight} 
+            />
+            <TouchableOpacity 
+              style={{ backgroundColor: colors.primary, padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10 }} 
+              onPress={() => {
+                if (manualHeight && manualWeight) {
+                  handleDataReceived(parseFloat(manualHeight), parseFloat(manualWeight));
+                  setManualHeight('');
+                  setManualWeight('');
+                } else {
+                  Alert.alert("Missing Data", "Please enter both height and weight.");
+                }
+              }}
+            >
+              <Text style={{ color: colors.white, fontWeight: 'bold', fontSize: 16 }}>Save Manual Entry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View>
+            {isInfantMode && (
+              <View style={{ marginBottom: 12 }}>
+                <Text style={{ color: '#0A3327', fontWeight: '600', marginBottom: 4 }}>Infant Length (Manual)</Text>
+                <TextInput 
+                  style={{ borderWidth: 1, borderColor: '#E2E8F0', padding: 12, borderRadius: 12, backgroundColor: '#F8FAFC' }} 
+                  placeholder="Enter length in cm (e.g. 65)" 
+                  keyboardType="numeric" 
+                  value={manualHeight}
+                  onChangeText={setManualHeight} 
+                />
+                <Text style={{ fontSize: 10, color: colors.textSecondary, marginTop: 4 }}>*Infants must be measured horizontally using an infantometer.</Text>
+              </View>
+            )}
+            <SimulatedScale 
+              isConnected={isScaleConnected} 
+              onDataReceived={handleDataReceived} 
+              isInfantMode={isInfantMode}
+              onToggleInfantMode={setIsInfantMode}
+            />
+          </View>
+        )}
         
         {/* Placeholder for BLE code */}
         {/* 
@@ -152,6 +279,45 @@ export default function HealthDriveScreen() {
           4. Call handleDataReceived(bleHeight, bleWeight) here automatically
         */}
       </View>
+
+      <MUACScannerModal 
+        visible={showMUACScanner}
+        onClose={() => setShowMUACScanner(false)}
+        onScanComplete={(color, value) => {
+          setShowMUACScanner(false);
+          let statusMessage = '';
+          let recordStatus = 'Healthy';
+          if (color === 'Green') { statusMessage = 'Healthy (Normal)'; recordStatus = 'Healthy'; }
+          if (color === 'Yellow') { statusMessage = 'Moderate Acute Malnutrition (MAM)'; recordStatus = 'MAM'; }
+          if (color === 'Red') { statusMessage = 'Severe Acute Malnutrition (SAM)'; recordStatus = 'SAM'; }
+          
+          Alert.alert('MUAC Scan Complete', `Detected Band: ${color}\nValue: ${value} mm\n\nStatus: ${statusMessage}`, [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Save Record', onPress: async () => {
+                if (scannedStudent) {
+                  const today = new Date().toISOString().split('T')[0];
+                  try {
+                    await addHealthRecord({
+                      student_db_id: scannedStudent.id!,
+                      date: today,
+                      height: 0, // Using 0 to indicate MUAC-only record
+                      weight: 0,
+                      status: recordStatus,
+                      z_score: 0
+                    });
+                    showToast('MUAC Record Saved Successfully', 'success');
+                    setScannedStudent(null);
+                    setIsScanning(true);
+                  } catch (e) {
+                    showToast('Failed to save MUAC record', 'error');
+                  }
+                } else {
+                  Alert.alert("Error", "No student selected");
+                }
+            }}
+          ]);
+        }}
+      />
     </View>
   );
 }
