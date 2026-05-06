@@ -236,7 +236,7 @@ function StaffDashboard() {
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/students')}><View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}><Ionicons name="add" size={24} color="#2E7D32" /></View><Text style={styles.actionText}>{t('dashboard.enroll')}</Text></TouchableOpacity>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/attendance')}><View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}><Ionicons name="checkmark-done" size={24} color="#1565C0" /></View><Text style={styles.actionText}>{t('dashboard.attend')}</Text></TouchableOpacity>
         <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/messages')}><View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}><Ionicons name="chatbubbles" size={24} color="#EF6C00" /></View><Text style={styles.actionText}>{t('dashboard.alerts')}</Text></TouchableOpacity>
-        <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/settings')}><View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}><Ionicons name="settings" size={24} color="#7B1FA2" /></View><Text style={styles.actionText}>{t('dashboard.config')}</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.quickActionCard} onPress={() => router.push('/health-drive')}><View style={[styles.actionIcon, { backgroundColor: '#F0F9F6' }]}><Ionicons name="fitness" size={24} color="#0A3327" /></View><Text style={styles.actionText}>Health Drive</Text></TouchableOpacity>
       </View>
 
       <View style={styles.activitySection}>

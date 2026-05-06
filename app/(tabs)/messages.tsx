@@ -27,7 +27,7 @@ export default function MessagesScreen() {
       const attendanceData = await getAttendanceByDate(today);
 
       const attendanceMap: Record<number, string> = {};
-      attendanceData.forEach(record => {
+      attendanceData.forEach((record: any) => {
         attendanceMap[record.student_db_id] = record.status;
       });
 
@@ -56,7 +56,7 @@ export default function MessagesScreen() {
       const filtered = students.filter(s =>
         s.first_name.toLowerCase().includes(query.toLowerCase()) ||
         s.last_name.toLowerCase().includes(query.toLowerCase()) ||
-        s.student_id.toLowerCase().includes(query.toLowerCase())
+        s.student_id?.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredStudents(filtered);
     }

@@ -203,6 +203,22 @@ export default function StudentDetailsScreen() {
   if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={colors.primary} /></View>;
   if (!student) return <View style={styles.centered}><Text>{t('common.no_data')}</Text></View>;
 
+  // Derived values for Analysis
+  const latestHealth = healthRecords[0];
+  const previousHealth = healthRecords[1];
+  
+  const zScoreVal = latestHealth?.z_score?.toFixed(1) || '0.0';
+  const zScoreNum = parseFloat(zScoreVal);
+  const zScoreStatus = zScoreNum >= -2 && zScoreNum <= 2 ? 'Normal Growth' : zScoreNum < -2 ? 'Needs Attention' : 'Above Average';
+  
+  const weightDiff = latestHealth && previousHealth ? (latestHealth.weight - previousHealth.weight).toFixed(1) : '0.0';
+  const weightTrendColor = parseFloat(weightDiff) >= 0 ? '#2E7D32' : '#D32F2F';
+  const weightTrendIcon = parseFloat(weightDiff) >= 0 ? 'trending-up' : 'trending-down';
+  
+  const whoStatus = latestHealth?.status || 'Unknown';
+  const whoColor = whoStatus === 'Healthy' ? '#2E7D32' : whoStatus === 'MAM' ? '#F57C00' : whoStatus === 'SAM' ? '#D32F2F' : '#1565C0';
+  const whoColorName = whoStatus === 'Healthy' ? 'Green' : whoStatus === 'MAM' ? 'Yellow' : whoStatus === 'SAM' ? 'Red' : 'Blue';
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -389,12 +405,28 @@ export default function StudentDetailsScreen() {
                 </View>
               </View>
               <View style={styles.anaMetricsRow}>
-                <View style={[styles.anaMetricCard, { backgroundColor: '#0A3327' }]}><Text style={[styles.anaMetricLabel, { color: '#8BA19A' }]}>HEIGHT-FOR-AGE</Text><Text style={[styles.anaMetricValue, { color: colors.white }]}>+0.8</Text><Text style={[styles.anaMetricStatus, { color: '#8BA19A' }]}>Excellent Progress</Text></View>
-                <View style={[styles.anaMetricCard, { backgroundColor: '#F1F5F9' }]}><Text style={[styles.anaMetricLabel, { color: colors.textSecondary }]}>WEIGHT-FOR-AGE</Text><Text style={[styles.anaMetricValue, { color: colors.text }]}>{healthRecords[0]?.weight || 0} kg</Text><View style={styles.anaMetricTrend}><Ionicons name="trending-up" size={14} color="#2E7D32" /><Text style={styles.anaMetricTrendText}>+0.4kg</Text></View></View>
+                <View style={[styles.anaMetricCard, { backgroundColor: '#0A3327' }]}>
+                  <Text style={[styles.anaMetricLabel, { color: '#8BA19A' }]}>HEIGHT-FOR-AGE Z-SCORE</Text>
+                  <Text style={[styles.anaMetricValue, { color: colors.white }]}>{zScoreNum > 0 ? '+' : ''}{zScoreVal}</Text>
+                  <Text style={[styles.anaMetricStatus, { color: '#8BA19A' }]}>{zScoreStatus}</Text>
+                </View>
+                <View style={[styles.anaMetricCard, { backgroundColor: '#F1F5F9' }]}>
+                  <Text style={[styles.anaMetricLabel, { color: colors.textSecondary }]}>LATEST WEIGHT</Text>
+                  <Text style={[styles.anaMetricValue, { color: colors.text }]}>{latestHealth?.weight || 0} kg</Text>
+                  <View style={styles.anaMetricTrend}>
+                    <Ionicons name={weightTrendIcon as any} size={14} color={weightTrendColor} />
+                    <Text style={[styles.anaMetricTrendText, { color: weightTrendColor }]}>{parseFloat(weightDiff) > 0 ? '+' : ''}{weightDiff}kg</Text>
+                  </View>
+                </View>
               </View>
               <View style={styles.anaWhoCard}>
-                <View style={styles.anaWhoIconContainer}><Ionicons name="shield-checkmark" size={20} color="#2E7D32" /></View>
-                <View style={styles.anaWhoInfo}><Text style={styles.anaWhoTitle}>WHO Growth Standard</Text><Text style={styles.anaWhoSubtitle}>Classified as: Green (Healthy)</Text></View>
+                <View style={[styles.anaWhoIconContainer, { backgroundColor: whoColor + '15' }]}>
+                  <Ionicons name="shield-checkmark" size={20} color={whoColor} />
+                </View>
+                <View style={styles.anaWhoInfo}>
+                  <Text style={styles.anaWhoTitle}>WHO Growth Standard</Text>
+                  <Text style={styles.anaWhoSubtitle}>Classified as: {whoColorName} ({whoStatus})</Text>
+                </View>
               </View>
             </ScrollView>
           </View>

@@ -258,6 +258,13 @@ export const getStudentById = async (id: number) => {
   return await db.getFirstAsync<Student>('SELECT * FROM students WHERE id = ?', [id]);
 };
 
+export const getStudentByStudentId = async (student_id: string) => {
+  if (Platform.OS === 'web') return webMockStudents.find(s => s.student_id === student_id) || null;
+
+  const db = await getDb();
+  return await db.getFirstAsync<Student>('SELECT * FROM students WHERE student_id = ?', [student_id]);
+};
+
 export const findStudentByParentMobile = async (mobile: string) => {
   if (Platform.OS === 'web') {
     return webMockStudents.find(s => s.father_mobile === mobile || s.mother_mobile === mobile) || null;
