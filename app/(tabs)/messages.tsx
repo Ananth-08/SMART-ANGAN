@@ -1,13 +1,12 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Alert, Linking, ActivityIndicator, TextInput } from 'react-native';
-import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
-import { getStudents, Student, getAttendanceByDate } from '../../utils/database';
-import { useToast } from '../../context/ToastContext';
+import { useFocusEffect } from 'expo-router';
 import * as SMS from 'expo-sms';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Alert, FlatList, Image, Linking, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useToast } from '../../context/ToastContext';
+import { colors } from '../../theme/colors';
+import { getAttendanceByDate, getStudents, Student } from '../../utils/database';
 
 export default function MessagesScreen() {
   const { t } = useTranslation();
@@ -26,7 +25,7 @@ export default function MessagesScreen() {
     try {
       const studentList = await getStudents();
       const attendanceData = await getAttendanceByDate(today);
-      
+
       const attendanceMap: Record<number, string> = {};
       attendanceData.forEach(record => {
         attendanceMap[record.student_db_id] = record.status;
@@ -54,8 +53,8 @@ export default function MessagesScreen() {
     if (query.trim() === '') {
       setFilteredStudents(students);
     } else {
-      const filtered = students.filter(s => 
-        s.first_name.toLowerCase().includes(query.toLowerCase()) || 
+      const filtered = students.filter(s =>
+        s.first_name.toLowerCase().includes(query.toLowerCase()) ||
         s.last_name.toLowerCase().includes(query.toLowerCase()) ||
         s.student_id.toLowerCase().includes(query.toLowerCase())
       );
@@ -88,7 +87,7 @@ export default function MessagesScreen() {
     }
 
     Alert.alert(
-      t('messaging.send_sms'),
+      t('messages.send_bulk'),
       "Which group would you like to message?",
       [
         {
@@ -109,7 +108,7 @@ export default function MessagesScreen() {
 
   const sendBulkSMS = async (status: 'Present' | 'Absent') => {
     const selectedStudents = students.filter(s => selectedIds.has(s.id!) && attendance[s.id!] === status);
-    
+
     if (selectedStudents.length === 0) {
       showToast(`No selected students are marked as ${status}`, 'info');
       return;
@@ -126,10 +125,10 @@ export default function MessagesScreen() {
 
     const isAvailable = await SMS.isAvailableAsync();
     if (isAvailable) {
-      const message = status === 'Present' 
+      const message = status === 'Present'
         ? "Dear Parent, your child was present at SmartAngan today. Thank you!"
         : "Dear Parent, your child was absent at SmartAngan today. Please ensure regular attendance.";
-      
+
       await SMS.sendSMSAsync(phoneNumbers, message);
     } else {
       showToast('SMS service not available on this device', 'error');
@@ -147,18 +146,22 @@ export default function MessagesScreen() {
   const renderStudentItem = ({ item }: { item: Student }) => {
     const isSelected = selectedIds.has(item.id!);
     const status = attendance[item.id!] || 'Not Marked';
-    
+
     return (
       <View style={styles.card}>
         <View style={styles.cardTop}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {item.first_name[0]}{item.last_name[0]}
-            </Text>
+            {item.profile_image ? (
+              <Image source={{ uri: item.profile_image }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+            ) : (
+              <Text style={styles.avatarText}>
+                {(item.first_name?.[0] || '')}{(item.last_name?.[0] || '')}
+              </Text>
+            )}
           </View>
           <View style={styles.info}>
-            <Text style={styles.name}>{item.first_name} {item.last_name}</Text>
-            <Text style={styles.guardian}>{t('students.guardian_info')}: {item.father_name || item.mother_name || 'N/A'}</Text>
+            <Text style={styles.name} numberOfLines={1}>{item.first_name} {item.last_name}</Text>
+            <Text style={styles.guardian} numberOfLines={1}>{t('students.guardian_info')}: {item.father_name || item.mother_name || 'N/A'}</Text>
             <View style={[styles.statusBadge, status === 'Present' ? styles.presentBadge : styles.absentBadge]}>
               <Text style={[styles.statusText, status === 'Present' ? styles.presentText : styles.absentText]}>
                 {status === 'Present' ? t('attendance.present') : t('attendance.absent')}
@@ -166,24 +169,24 @@ export default function MessagesScreen() {
             </View>
           </View>
           <TouchableOpacity onPress={() => toggleSelect(item.id!)} style={styles.checkbox}>
-            <Ionicons 
-              name={isSelected ? "checkbox" : "square-outline"} 
-              size={26} 
-              color={isSelected ? colors.primary : colors.border} 
+            <Ionicons
+              name={isSelected ? "checkbox" : "square-outline"}
+              size={26}
+              color={isSelected ? colors.primary : colors.border}
             />
           </TouchableOpacity>
         </View>
 
         <View style={styles.cardActions}>
-          <TouchableOpacity 
-            style={styles.callButton} 
+          <TouchableOpacity
+            style={styles.callButton}
             onPress={() => handleCall(item.father_mobile || item.mother_mobile)}
           >
             <Ionicons name="call" size={18} color={colors.white} />
-            <Text style={styles.callButtonText}>{t('messaging.call_parent')}</Text>
+            <Text style={styles.callButtonText}>{t('messages.call_parent', { defaultValue: 'Call Parent' })}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.smsButton}
             onPress={async () => {
               const phone = item.father_mobile || item.mother_mobile;
@@ -209,17 +212,17 @@ export default function MessagesScreen() {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.multiSelectRow} onPress={toggleSelectAll}>
-          <Ionicons 
-            name={selectedIds.size === students.length && students.length > 0 ? "checkbox" : "square-outline"} 
-            size={24} 
-            color={colors.primary} 
+          <Ionicons
+            name={selectedIds.size === students.length && students.length > 0 ? "checkbox" : "square-outline"}
+            size={24}
+            color={colors.primary}
           />
-          <Text style={styles.multiSelectText}>{t('messaging.select_all')}</Text>
+          <Text style={styles.multiSelectText}>{t('messages.select_all')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.sendSmsButton} onPress={handleSendSMS}>
           <Ionicons name="send" size={18} color={colors.white} />
-          <Text style={styles.sendSmsText}>{t('messaging.send_sms')}</Text>
+          <Text style={styles.sendSmsText}>{t('messages.send_bulk')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -227,7 +230,7 @@ export default function MessagesScreen() {
         <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder={t('messaging.search_placeholder')}
+          placeholder={t('messages.search_placeholder')}
           value={searchQuery}
           onChangeText={handleSearch}
           placeholderTextColor="#94A3B8"

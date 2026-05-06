@@ -12,6 +12,8 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useTranslation } from 'react-i18next';
+import { calculateWHOZScore, calculateAgeInMonths } from '../../../utils/zScore';
+import SmartScannerModal from '../../../components/SmartScannerModal';
 
 const { width } = Dimensions.get('window');
 
@@ -49,6 +51,7 @@ export default function StudentDetailsScreen() {
   const [showVaccineModal, setShowVaccineModal] = useState(false);
   const [showMealModal, setShowMealModal] = useState(false);
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [showSmartScanner, setShowSmartScanner] = useState(false);
   
   // Input State
   const [newHeight, setNewHeight] = useState('');
@@ -109,10 +112,18 @@ export default function StudentDetailsScreen() {
     }
     const h = parseFloat(newHeight);
     const w = parseFloat(newWeight);
-    const { status } = calculateStatus(h, w);
+    
+    // Calculate Age in Months for WHO Z-Score
+    let ageInMonths = 24; // fallback
+    if (student?.dob) {
+      ageInMonths = calculateAgeInMonths(student.dob);
+    }
+    const gender = student?.gender || 'Other';
+
+    const { status, zScore } = calculateWHOZScore(h, w, ageInMonths, gender);
     const date = recordDate.toISOString().split('T')[0];
     try {
-      await addHealthRecord({ student_db_id: Number(id), date, height: h, weight: w, status, z_score: 0 });
+      await addHealthRecord({ student_db_id: Number(id), date, height: h, weight: w, status, z_score: zScore });
       showToast('Health data saved', 'success');
       setShowAddModal(false);
       setNewHeight(''); setNewWeight(''); setRecordDate(new Date());
@@ -304,7 +315,16 @@ export default function StudentDetailsScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}><TouchableOpacity onPress={() => setShowAddModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity></View>
             <TouchableOpacity style={styles.datePickerTrigger} onPress={() => setShowDatePicker(true)}><Ionicons name="calendar-outline" size={20} color={colors.primary} /><Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text></TouchableOpacity>
-            <TextInput style={styles.modalInput} value={newHeight} onChangeText={setNewHeight} keyboardType="numeric" placeholder={t('students.height')} />
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TextInput style={[styles.modalInput, { flex: 1 }]} value={newHeight} onChangeText={setNewHeight} keyboardType="numeric" placeholder={t('students.height')} />
+              <TouchableOpacity 
+                style={{ backgroundColor: '#E8F5E9', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16, borderRadius: 16 }}
+                onPress={() => setShowSmartScanner(true)}
+              >
+                <Ionicons name="scan-outline" size={24} color="#2E7D32" />
+                <Text style={{ fontSize: 10, color: '#2E7D32', fontWeight: '700', marginTop: 4 }}>AI Scan</Text>
+              </TouchableOpacity>
+            </View>
             <TextInput style={styles.modalInput} value={newWeight} onChangeText={setNewWeight} keyboardType="numeric" placeholder={t('students.weight')} />
             <TouchableOpacity style={styles.saveHealthButton} onPress={handleAddHealthData}><Text style={styles.saveHealthButtonText}>{t('common.save')}</Text></TouchableOpacity>
           </View>
@@ -382,6 +402,17 @@ export default function StudentDetailsScreen() {
       </Modal>
 
       {showDatePicker && <DateTimePicker value={recordDate} mode="date" display="default" onChange={(e,d)=>{setShowDatePicker(false);if(d)setRecordDate(d);}} maximumDate={new Date()} />}
+
+      {/* Smart Scanner Camera Modal */}
+      <SmartScannerModal
+        visible={showSmartScanner}
+        onClose={() => setShowSmartScanner(false)}
+        onScanComplete={(scannedHeight) => {
+          setNewHeight(scannedHeight);
+          setShowSmartScanner(false);
+          showToast(`Height detected: ${scannedHeight}cm`, 'success');
+        }}
+      />
     </View>
   );
 }
